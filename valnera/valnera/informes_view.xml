@@ -1,0 +1,749 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+
+<!-- #####################################################################################################################################################################################
+
+								PRIMER INFORME - Gastos Expedición
+
+################################################################################################################################################################## -->
+<!--  INFORME POR FILTROS   -->
+
+      <record id="expediciones_inf1_tree" model="ir.ui.view">
+      <field name="name">expediciones_inffil_form.valnera.tree</field>
+      <field name="model">expediciones.informefil</field>
+      <field name="type">tree</field>
+      <field name="arch" type="xml">
+	<tree>
+	   <field name="name"/>
+	</tree>
+      </field>
+    </record>
+
+
+      <record id="expediciones_inffil_form" model="ir.ui.view">
+      <field name="name">expediciones_inffil_form.valnera.form</field>
+      <field name="model">expediciones.informefil</field>
+      <field name="type">form</field>
+      <field name="arch" type="xml">
+	<form>
+	   <field name="name"  colspan="4"/>
+	   <newline/>
+	   <notebook colspan="6">
+	   <page string ="Filtros">
+	   <separator string="Expedición" colspan="4"/>
+	   <newline/>
+	   <field name="nexpedicion"  colspan="2 " on_change="ch_ex(nexpedicion)"/>	   
+	   <field name="nescala"  colspan="2"  on_change="ch_es(nescala)"/>
+	   <newline/>	 
+	   <separator string="Por fechas de factura" colspan="4"/>
+	   <newline/>
+	   <field name="fecha1"  colspan="2 " on_change="chfec()"/>	   
+	   <field name="fecha2"  colspan="2" />
+	   <separator string="" colspan="4"/>
+	   <field name="mes"  colspan="2"  on_change="chmes()"/>
+	   <field name="anio"  colspan="2"  />
+	   <newline/>	   
+	   <newline/>
+
+	   <group colspan="2">
+	   <separator string="Opción" />
+	   <newline/>
+	   	<field name="op1" on_change="cop1(ex1,ex2)" />
+	   <newline/>
+	   	<field name="op2" on_change="cop2(ex1,ex2)" />
+	   <newline/>
+	   	<field name="op3" on_change="cop3(ex1,ex2)" />	
+	   </group>
+   		
+	   <group colspan="2">
+	    <separator string="Expedición" />
+	   <newline/>
+	   	<field name="ex1" on_change="cex1(op1,op2)" />
+	   <newline/>
+	   	<field name="ex2" on_change="cex2(op1,op2)" />
+	   <newline/>
+	   	<field name="ex3" on_change="cex3(op1,op2)" />
+	   </group>
+
+	   <separator string="Cliente" colspan="4" />
+	   <newline/>
+	   <field name="cliente"  colspan="4" nolabel="1" domain="[('customer','=',True)]" />
+	   <newline/>
+	   <separator string="" colspan="4"   />
+	   <newline/>
+
+	   <button name="generar_informe" type="object" string="Generar" icon="terp-gdu-smart-failing"  colspan="4"/>
+	   </page>
+	   <page string ="Resultados">
+	  
+	   <field name="most" invisible="1"/>
+
+	   <field name="lineas" colspan="4" nolabel="1" readonly="1"  attrs="{'invisible':[('most','!=',1)]}">
+				<tree string="Registros">
+				    <field name="nexpedicion" width="70"/>
+				    <field name="nescala" width="80"/>
+				    <field name="fexpedicion" />  <field name="rexpedicion" width="120"/>
+				    <field name="nfactura" />
+				    <field name="ffactura" width="100"/>
+				    <field name="cliente" />
+				    <field name="cfactura" />
+				    <field name="recibido" />
+				    <field name="emitido" />
+				</tree>
+	   </field>
+
+	   <field name="lineas2" colspan="4" nolabel="1" readonly="1"  attrs="{'invisible':[('most','!=',2)]}">
+				<tree string="Registros">
+				    <field name="nexpedicion" width="70"/>
+				    <field name="nescala" width="80"/>
+				    <field name="fexpedicion" />  <field name="rexpedicion" width="120"/>
+				    <field name="nfactura" />
+				    <field name="ffactura" width="80" />
+				    <field name="cliente" />
+				    <field name="cfactura" />
+				    <field name="recibido" />
+				</tree>
+	   </field>
+
+	   <field name="lineas3" colspan="4" nolabel="1" readonly="1"  attrs="{'invisible':[('most','!=',3)]}">
+				<tree string="Registros">
+				    <field name="nexpedicion" width="70"/>
+				    <field name="nescala" width="80"/>
+				    <field name="fexpedicion" />  <field name="rexpedicion" width="120"/>
+				    <field name="nfactura" />
+				    <field name="ffactura" width="80" />
+				    <field name="cliente" />
+				    <field name="cfactura" />
+				    <field name="emitido" />
+				</tree>
+	   </field>
+
+	   <field name="lineas4" colspan="4" nolabel="1" readonly="1"  attrs="{'invisible':[('most','!=',4)]}">
+				<tree string="Registros">
+				    <field name="nescala" width="80"/>
+				    <field name="fexpedicion" />  <field name="rexpedicion" width="120"/>
+				    <field name="nfactura" />
+				    <field name="ffactura" width="80" />
+				    <field name="cliente" />
+				    <field name="cfactura" />
+				    <field name="recibido" />
+				    <field name="emitido" />
+				</tree>
+	   </field>
+
+	   <field name="lineas5" colspan="4" nolabel="1" readonly="1"  attrs="{'invisible':[('most','!=',5)]}">
+				<tree string="Registros">				    
+				    <field name="nexpedicion" width="70"/>
+				    <field name="nescala" width="80"/>
+				    <field name="fexpedicion" />  <field name="rexpedicion" width="120"/>
+				    <field name="nfactura" />
+				    <field name="ffactura" width="80" />
+				    <field name="cliente" />
+				    <field name="cfactura" />
+				    <field name="recibido" />
+				</tree>
+	   </field>
+
+	   <field name="lineas6" colspan="4" nolabel="1" readonly="1"  attrs="{'invisible':[('most','!=',6)]}">
+				<tree string="Registros">
+				    <field name="nexpedicion" width="70"/>
+				    <field name="nescala" width="80"/>
+				    <field name="fexpedicion" />  <field name="rexpedicion" width="120"/>
+				    <field name="nfactura" />
+				    <field name="ffactura" width="80" />
+				    <field name="cliente" />
+				    <field name="cfactura" />
+				    <field name="emitido" />
+				</tree>
+	   </field>
+
+	   <field name="lineas7" colspan="4" nolabel="1" readonly="1"  attrs="{'invisible':[('most','!=',7)]}">
+				<tree string="Registros">
+				    <field name="nexpedicion" width="70"/>
+				    <field name="fexpedicion" />  <field name="rexpedicion" width="120"/>
+				    <field name="nfactura" />
+				    <field name="ffactura" width="80" />
+				    <field name="cliente" />
+				    <field name="cfactura" />
+				    <field name="recibido" />
+				    <field name="emitido" />
+				</tree>
+	   </field>
+
+	   <field name="lineas8" colspan="4" nolabel="1" readonly="1"  attrs="{'invisible':[('most','!=',8)]}">
+				<tree string="Registros">
+				    <field name="nexpedicion" width="70"/>
+				    <field name="nescala" width="80"/>
+				    <field name="fexpedicion" />  <field name="rexpedicion" width="120"/>
+				    <field name="ffactura" width="80" />
+				    <field name="cliente" />
+				    <field name="cfactura" />
+				    <field name="recibido" />
+				</tree>
+	   </field>
+
+	   <field name="lineas9" colspan="4" nolabel="1" readonly="1"  attrs="{'invisible':[('most','!=',9)]}">
+				<tree string="Registros">
+				    <field name="nexpedicion" width="70"/>
+				    <field name="fexpedicion" />
+				    <field name="rexpedicion" width="100"/>
+				    <field name="nfactura" />
+				    <field name="ffactura" width="80" />
+				    <field name="cliente" />
+				    <field name="cfactura" />
+				    <field name="emitido" />
+				</tree>
+	   </field>
+
+
+	   </page>
+	   </notebook>
+	</form>
+      </field>
+    </record>
+
+
+
+	<record model="ir.actions.act_window" id="actio_inf_trifil">
+            <field name="name">Gastos Expedición</field>
+            <field name="res_model">expediciones.informefil</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form,tree</field>
+        </record>
+ 
+     
+ 
+    <menuitem id="menu_expediciones_inffil"      name="Gastos Expedición"
+            parent="menu_expediciones_inf"
+	    action="actio_inf_trifil"
+            sequence="2"/>
+
+
+    
+
+
+
+<!-- REgistros -->
+
+      <record id="expediciones_inf1_reg_search" model="ir.ui.view">
+      <field name="name">expediciones_inffil_reg_tree.valnera.search</field>
+      <field name="model">lineas.aux</field>
+      <field name="type">search</field>
+      <field name="arch" type="xml">
+	<search string="Registros">
+	 <field name="informe" widget="selection" colspan="16" />
+	</search>
+      </field>
+    </record>
+
+      <record id="expediciones_inf1_reg_tree" model="ir.ui.view">
+      <field name="name">expediciones_inffil_reg_tree.valnera.tree</field>
+      <field name="model">lineas.aux</field>
+      <field name="type">tree</field>
+      <field name="arch" type="xml">
+				<tree string="Registros Gastos Expedición">
+				    <field name="nexpedicion"  width="80"/>
+				    <field name="nescala"  width="80"/>
+				    <field name="fexpedicion" />
+				    <field name="rexpedicion" />
+				    <field name="nfactura" />
+				    <field name="ffactura" width="80"/>
+				    <field name="cfactura" />
+				    <field name="cliente" />
+				    <field name="recibido" />
+				    <field name="emitido" />
+				</tree>
+      </field>
+    </record>
+
+	<record model="ir.actions.act_window" id="actio_inf_reg_trifil">
+            <field name="name">Registros Gastos Expedición</field>
+            <field name="res_model">lineas.aux</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+  
+<!-- #####################################################################################################################################################################################
+
+								INFORME ANUAL
+
+################################################################################################################################################################## -->
+
+
+
+<!--  INFORME TRIMESTRAL  -->
+
+      <record id="expediciones_inf1_tree" model="ir.ui.view">
+      <field name="name">expediciones_inf1_form.valnera.tree</field>
+      <field name="model">expediciones.informe</field>
+      <field name="type">tree</field>
+      <field name="arch" type="xml">
+	<tree>
+	   <field name="name"/>
+	   <field name="fecha1"/>
+	   <field name="fecha2"/>
+	</tree>
+      </field>
+    </record>
+
+
+      <record id="expediciones_inf1_form" model="ir.ui.view">
+      <field name="name">expediciones_inf1_form.valnera.form</field>
+      <field name="model">expediciones.informe</field>
+      <field name="type">form</field>
+      <field name="arch" type="xml">
+	<form>
+	   <notebook colspan="6">
+	   <page string ="Filtros">
+	   <field name="name"  colspan="4"/>
+	   <newline/>
+	   <separator string="Entre las fechas de expediciones" colspan="4"/>
+           <newline/>
+	   <field name="fecha1"  colspan="2"  on_change="chfec()"/>	   
+	   <newline/>
+	   <field name="fecha2"  colspan="2" />
+	   <newline/>
+	   <separator string="Del mes" colspan="4"/>
+           <newline/>
+	   <field name="mes"  colspan="2"  on_change="chmes()"/> 
+	   <newline/>
+	   <field name="anio"  colspan="2" />
+	   <newline/>
+
+	   <group colspan="4">
+	    <separator string="Expedición" />
+	   <newline/>
+	   	<field name="ex1" on_change="cex1()" />
+	   <newline/>
+	   	<field name="ex2" on_change="cex2()" />
+	   <newline/>
+	   	<field name="ex3" on_change="cex3()" />
+	   </group>
+	   <newline/>
+	   <button name="generar_informe" type="object" string="Generar" icon="terp-gdu-smart-failing"  colspan="4"/>
+	   </page>
+	   <page string ="Resultados">
+	   <separator string="Estimado" />
+	   <newline/>
+	   <field name="totbe" attrs="{'invisible':[('ex1','=',True)]}"/>
+	   <field name="totme" attrs="{'invisible':[('ex2','=',True)]}"/>
+	   <field name="tote" attrs="{'invisible':[('ex3','!=',True)]}"/>
+	   <newline/>
+	   <separator string="Real" />
+	   <newline/>
+	   <field name="totb" attrs="{'invisible':[('ex1','=',True)]}"/>
+	   <field name="totm" attrs="{'invisible':[('ex2','=',True)]}"/>
+	   <field name="tot" attrs="{'invisible':[('ex3','!=',True)]}"/>
+	   <newline/>
+
+	   <field name="lineas" colspan="4" nolabel="1" readonly="1"  attrs="{'invisible':[('ex2','!=',True)]}">
+				<tree string="Registros" >
+				    <field name="nescala"  width="80"/>
+				    <field name="fexpedicion"  width="80"/>
+				    <field name="rexpedicion" />
+				    <field name="be"/>
+				    <field name="br" />
+				    <field name="estado" />
+				</tree>
+	   </field>
+
+
+	    <field name="lineas2" colspan="4" nolabel="1" readonly="1"  attrs="{'invisible':[('ex1','!=',True)]}">
+				<tree string="Registros" >
+				    <field name="nexpedicion"  width="70"/>
+				    <field name="fexpedicion"  width="80"/>
+				    <field name="rexpedicion" />
+				    <field name="me"/>
+				    <field name="mr" />
+				    <field name="estado" />
+				</tree>
+	   </field> 
+	   
+
+           <field name="lineas3" colspan="4" nolabel="1" readonly="1"  attrs="{'invisible':[('ex3','!=',True)]}">
+				<tree string="Registros" >
+				    <field name="nexpedicion"  width="70"/>
+				    <field name="nescala"  width="80"/>
+				    <field name="fexpedicion"  width="80"/>
+				    <field name="rexpedicion" />
+				    <field name="te"/>
+				    <field name="tr" />
+				    <field name="estado" />
+				</tree>
+	   </field>
+	   </page>
+	   </notebook>
+	</form>
+      </field>
+    </record>
+
+
+
+	<record model="ir.actions.act_window" id="actio_inf_tri">
+            <field name="name">Informe Anual</field>
+            <field name="res_model">expediciones.informe</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form,tree</field>
+        </record>
+  
+
+
+    <menuitem id="menu_expediciones_inf"      name="Informes"
+            parent="menu_base_expediciones"
+            sequence="9"/>
+
+
+     
+    <menuitem id="menu_expediciones_inf1"      name="Informe Anual"
+            parent="menu_expediciones_inf"
+	    action="actio_inf_tri"
+            sequence="2"/>
+     
+
+<!-- REgistros -->
+
+      <record id="expediciones_aux_reg_search" model="ir.ui.view">
+      <field name="name">expediciones.aux.valnera.search</field>
+      <field name="model">expediciones.aux</field>
+      <field name="type">search</field>
+      <field name="arch" type="xml">
+	<search string="Registros">
+	 <field name="informe_id" widget="selection" colspan="16" />
+	</search>
+      </field>
+    </record>
+
+      <record id="expediciones_aux_reg_tree" model="ir.ui.view">
+      <field name="name">expediciones.aux.valnera.tree</field>
+      <field name="model">expediciones.aux</field>
+      <field name="type">tree</field>
+      <field name="arch" type="xml">
+				<tree string="Registros Informe anual">
+				    <field name="nexpedicion"  width="70"/>
+				    <field name="nescala"  width="80"/>
+				    <field name="fexpedicion"  width="80"/>
+				    <field name="rexpedicion" />
+				    <field name="be" />
+				    <field name="br" />
+				    <field name="me" />
+				    <field name="mr" />
+				    <field name="te" />
+				    <field name="tr" />
+				</tree>
+      </field>
+    </record>
+
+	<record model="ir.actions.act_window" id="actio_inf_reg_trifil8">
+            <field name="name">Registros Informe anual</field>
+            <field name="res_model">expediciones.aux</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+  
+
+     
+
+<!-- #####################################################################################################################################################################################
+
+								TERCER INFORME - Registro Expediciones
+
+################################################################################################################################################################## -->
+
+
+
+<!--  INFORME Registrow  -->
+
+      <record id="expediciones_cabecera_tree" model="ir.ui.view">
+      <field name="name">expediciones_inf1_form.cabecera.valnera.tree</field>
+      <field name="model">expediciones.cabecera</field>
+      <field name="type">tree</field>
+      <field name="arch" type="xml">
+	<tree>
+	   <field name="name"/>
+	   <field name="fecha1"/>
+	   <field name="fecha2"/>
+	</tree>
+      </field>
+    </record>
+
+
+      <record id="expediciones_inf1_cabecera_form" model="ir.ui.view">
+      <field name="name">expediciones_inf1_form.cabecera.form</field>
+      <field name="model">expediciones.cabecera</field>
+      <field name="type">form</field>
+      <field name="arch" type="xml">
+	<form>
+	   <notebook colspan="6">
+	   <page string ="Filtros">
+	   <field name="name"  colspan="4"/>
+	   <newline/>
+	   <separator string="Entre las fechas" colspan="4"/>
+           <newline/>
+	   <field name="fecha1"  colspan="2"  on_change="chfec()"/>	   
+	   <newline/>
+	   <field name="fecha2"  colspan="2" />
+	   <newline/>
+	   <separator string="Del mes" colspan="4"/>
+           <newline/>
+	   <field name="mes"  colspan="2"  on_change="chmes()"/> 
+	   <newline/>
+	   <field name="anio"  colspan="2" />
+	   <newline/>
+	    <separator string="Expedición" />
+	   <newline/>
+	   	<field name="ex1" on_change="cex1()" />
+	   <newline/>
+	   	<field name="ex2" on_change="cex2()" />
+	   <newline/>
+	   	<field name="ex3" on_change="cex3()" />
+	   <newline/>
+	   <newline/>
+	   <button name="generar_informe" type="object" string="Generar" icon="terp-gdu-smart-failing"  colspan="4"/>
+
+	   </page>
+	   <page string ="Resultados">
+
+	   <field name="lineas" colspan="4" nolabel="1" readonly="1"  >
+				<tree string="Registros">
+				    <field name="nexpedicion"  width="70"/>
+				    <field name="nescala"  width="80"/>
+				    <field name="fexpedicion"  width="80"/>
+				    <field name="rexpedicion" />
+				    <field name="mercancia" />
+				    <field name="kilos" />
+				    <field name="cliente" />
+				</tree>
+	   </field>
+	  
+
+
+
+	   </page>
+	   </notebook>
+	</form>
+      </field>
+    </record>
+
+
+
+	<record model="ir.actions.act_window" id="actio_inf_tri_cabecra">
+            <field name="name">Informe Registro expediciones</field>
+            <field name="res_model">expediciones.cabecera</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form,tree</field>
+        </record>
+  
+
+
+
+
+
+     
+    <menuitem id="menu_expediciones_inf8"      name="Registro Expediciones"
+            parent="menu_expediciones_inf"
+	    action="actio_inf_tri_cabecra"
+            sequence="2"/>
+     
+
+<!-- REgistros -->
+
+      <record id="expediciones_aux_cabecera_reg_search" model="ir.ui.view">
+      <field name="name">expediciones.aux.cabecera.valnera.search</field>
+      <field name="model">expediciones.aux.cabecera</field>
+      <field name="type">search</field>
+      <field name="arch" type="xml">
+	<search string="Registros">
+	 <field name="informe_id" widget="selection" colspan="16" />
+	</search>
+      </field>
+    </record>
+
+      <record id="expediciones_aux_cabecera_reg_tree" model="ir.ui.view">
+      <field name="name">expediciones.aux.cabecera.valnera.tree</field>
+      <field name="model">expediciones.aux.cabecera</field>
+      <field name="type">tree</field>
+      <field name="arch" type="xml">
+				<tree string="Registros Registro Expediciones">
+				    <field name="nexpedicion"  width="70"/>
+				    <field name="fexpedicion"  width="80"/>
+				    <field name="rexpedicion" />
+				    <field name="mercancia" />
+				    <field name="kilos" />
+				    <field name="cliente" />
+				</tree>
+      </field>
+    </record>
+
+	<record model="ir.actions.act_window" id="actio_inf_reg_trifil_cabecera">
+            <field name="name">Registros Registro Expediciones</field>
+            <field name="res_model">expediciones.aux.cabecera</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+  
+
+
+
+<!-- #####################################################################################################################################################################################
+
+								CUARTO INFORME
+
+							Facturas emitidas y recibidas
+
+################################################################################################################################################################## -->
+<!--  INFORME POR FILTROS   -->
+
+      <record id="informe_facturas_tree" model="ir.ui.view">
+      <field name="name">informe.facturas.valnera.tree</field>
+      <field name="model">informe.facturas</field>
+      <field name="type">tree</field>
+      <field name="arch" type="xml">
+	<tree>
+	   <field name="name"/>
+	</tree>
+      </field>
+    </record>
+
+
+      <record id="informe_facturas_form" model="ir.ui.view">
+      <field name="name">einforme_facturas_form.valnera.form</field>
+      <field name="model">informe.facturas</field>
+      <field name="type">form</field>
+      <field name="arch" type="xml">
+	<form>
+	   <field name="name"  colspan="4"/>
+	   <newline/>
+	   <notebook colspan="6">
+	   <page string ="Filtros">
+	   <group colspan="2">
+	   <separator string="Opción" />
+	   <newline/>
+	   	<field name="opcion" on_change="chop(opcion)" />
+	   	<field name="op_diarios"  invisible="1"/>
+	   	<field name="diario"  domain="[('type','in',eval(op_diarios))]" />
+	   </group>
+   	   <newline/>
+	   <separator string="Por fechas" colspan="4"/>
+	   <newline/>
+	   <field name="fecha1"  colspan="2 " on_change="chfec()"/>	   
+	   <field name="fecha2"  colspan="2" />
+	   <separator string="" colspan="4"/>
+	   <field name="mes"  colspan="2"  on_change="chmes()"/>
+	   <field name="anio"  colspan="2"  />
+	   <newline/>	   
+	   <newline/>
+
+	   <button name="generar_informe" type="object" string="Generar" icon="terp-gdu-smart-failing"  colspan="4"/>
+	   </page>
+	   <page string ="Resultados">
+	  
+			    <field name="tot_bases" colspan="4"/>
+			    <field name="tot_ivas" colspan="4"/>
+			    <field name="tot_totals" colspan="4"/>
+           <newline/>
+
+	   <field name="impuestos" colspan="4" nolabel="1" readonly="1" invisible="1">
+				<tree string="Impuestos agrupados">
+				    <field name="name"  />
+				    <field name="base"  width="120"/>
+				    <field name="cuota"  width="120"/>
+				    <field name="total" />
+				</tree>
+	   </field>
+
+
+	   <field name="lineas" colspan="4" nolabel="1" readonly="1"  attrs="{'invisible':[('most','!=',9)]}">
+				<tree string="Registros">
+				    <field name="ffactura"  width="80"/>
+				    <field name="asiento" />
+				    <field name="subcuenta" />
+				    <field name="nif" />
+				    <field name="base" />
+				    <field name="iva" />
+				    <field name="civa" />
+				    <field name="total" />
+				</tree>
+	   </field>
+
+
+	   </page>
+
+	   </notebook>
+	
+	</form>
+      </field>
+    </record>
+
+
+
+	<record model="ir.actions.act_window" id="actio_inf_factemt">
+            <field name="name">Facturas Emitidas/Recibidas</field>
+            <field name="res_model">informe.facturas</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form,tree</field>
+        </record>
+ 
+     <menuitem id="menu_inf_cont"      name="Facturas emitidas/recibidas"
+            parent="account.menu_finance_reporting"
+            sequence="2"/>
+ 
+    <menuitem id="menu_inf_cont_fact"      name="Facturas emitidas/recibidas"
+            parent="menu_inf_cont"
+	    action="actio_inf_factemt"
+            sequence="2"/>
+
+
+    
+
+
+
+<!-- REgistros -->
+
+      <record id="lineas_emire_aux_search" model="ir.ui.view">
+      <field name="name">lineas.emire.aux.valnera.search</field>
+      <field name="model">lineas.emire.aux</field>
+      <field name="type">search</field>
+      <field name="arch" type="xml">
+	<search string="Registros">
+	 <field name="informe_ids" widget="selection" colspan="16" />
+	</search>
+      </field>
+    </record>
+
+      <record id="expediciones_inf1_reg_tree" model="ir.ui.view">
+      <field name="name">expediciones_inffil_reg_tree.valnera.tree</field>
+      <field name="model">lineas.emire.aux</field>
+      <field name="type">tree</field>
+      <field name="arch" type="xml">
+				<tree string="Registros">
+				    <field name="ffactura"  width="80"/>
+				    <field name="subcuenta" />
+				    <field name="nif" />
+				    <field name="asiento" />
+				    <field name="base" />
+				    <field name="iva" />
+				    <field name="civa" />
+				    <field name="total" />
+				</tree>
+      </field>
+    </record>
+
+	<record model="ir.actions.act_window" id="actio_inf_reg_facturas">
+            <field name="name">Registros informe facturas emitidas/recibidas</field>
+            <field name="res_model">lineas.emire.aux</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+  
+
+     
+    <menuitem id="menu_expediciones_reg_facturas"      name="Registros Facturas emitidas"
+            parent="menu_inf_cont"
+	    action="actio_inf_reg_facturas"
+            sequence="2"/>
+
+
+  </data>
+</openerp>

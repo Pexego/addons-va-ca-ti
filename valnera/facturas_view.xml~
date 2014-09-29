@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+    <!--
+    Partners Extension
+  -->
+
+    <record id="account_invoice_valnera_form" model="ir.ui.view">
+      <field name="name">account.invoice_form.valnera.form.inherit</field>
+      <field name="model">account.invoice</field>
+      <field name="type">form</field>
+      <field name="inherit_id" ref="account.invoice_form"/>
+      <field name="arch" type="xml">
+	<field name="name" position="after">
+	    <field name="expedicion_id" />
+	    <field name="afecta" />	    
+	</field>
+      </field>
+    </record>
+
+
+
+    <record id="view_invoice_line_form_inh_form" model="ir.ui.view">
+      <field name="name">account.view.invoice.line.form.form.inherit</field>
+      <field name="model">account.invoice.line</field>
+      <field name="type">form</field>
+      <field name="inherit_id" ref="account.view_invoice_line_form"/>
+      <field name="arch" type="xml">
+	<field name="discount" position="after">
+	    <field name="expedicion_id" />
+	    <field name="afecta" />
+	    <field name="recibido" />
+	</field>
+      </field>
+    </record>
+
+<!-- PROVEEDORES  -->
+
+    <record id="account_invoice_sup_valnera_form" model="ir.ui.view">
+      <field name="name">account.invoice_sup_form.valnera.form.inherit</field>
+      <field name="model">account.invoice</field>
+      <field name="type">form</field>
+      <field name="inherit_id" ref="account.invoice_supplier_form"/>
+      <field name="arch" type="xml">
+	<field name="partner_id" position="before">
+	    <field name="expedicion_id" />
+	    <field name="recibido" />	    
+	    <newline/>
+	</field>
+      </field>
+    </record>
+
+
+
+
+
+  </data>
+</openerp>

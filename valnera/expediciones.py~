@@ -1,0 +1,318 @@
+# -*- coding: utf-8 -*-
+##############################################################################
+#
+#    OpenERP, Open Source Management Solution
+#    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+##############################################################################
+
+from datetime import datetime, timedelta
+from osv import fields, osv
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+from tools.translate import _
+
+class gastos_gastos(osv.osv):
+    _name= 'gastos.gastos'
+
+
+    def write(self, cr, uid, ids, vals, context=None):
+        if context is None:
+            context = {}
+
+        if type(ids) == list:
+            ids = ids[0]   
+
+        gasto = self.browse(cr, uid, ids)
+
+        if gasto.estado == 'recibido':
+            vals['recibido'] = gasto.qty
+        else:
+            vals['emitido'] = gasto.qty
+
+        res = super(gastos_gastos,self).write(cr, uid, ids, vals, context=context)
+
+        if type(ids) == list:
+            ids = ids[0]
+
+        
+
+        exp_s = self.pool.get('expediciones.expediciones')
+        cli = self.pool.get('res.partner')
+
+        if not 'ana_line' in vals and not ( ( 'recibido' in vals) or ( 'emitido' in vals)):
+            print str(vals)
+            raise osv.except_osv(_('Aviso'),_('No se puede modificar una entrada de contabilidad'))      
+            exp = exp_s.browse(cr, uid, gasto.expedicion_id.id)
+     
+            if len(self.pool.get('expedicion.contabilidad').search(cr, uid, [])) <1:   
+                raise osv.except_osv(_('Error'),_('Tienes que configurar la cuenta y el diario de contabilidad analitica antes de poder asignar costes)'))               
+            
+            analytic_line = self.pool.get('account.analytic.line')
+            conta = self.pool.get('expedicion.contabilidad').browse(cr, uid,self.pool.get('expedicion.contabilidad').search(cr, uid, []) )[0]
+            print 'apsa '+str(gasto.cliente)
+            values = {
+                        'name':gasto.name,
+                        'amount':gasto.qty,
+                        'account_id':conta.name.id,
+                        'general_account_id':gasto.cliente.property_account_receivable.id,
+                        'date':datetime.now(),
+                        'journal_id':conta.diario.id,
+                      }
+
+            line_id = analytic_line.write(cr, gasto.ana_line.id, uid, values)
+
+  
+
+        if gasto.expedicion_id:
+            gasto.expedicion_id.recalcular()      
+
+        return res 
+
+    def create(self, cr, uid, vals, context=None):
+        if context is None:
+            context = {}
+        exp_s = self.pool.get('expediciones.expediciones')
+        cli = self.pool.get('res.partner')
+
+        exp = exp_s.browse(cr, uid, vals['expedicion_id'])
+        if not 'cliente' in vals:
+            vals['cliente'] = exp.cliente_id.id
+            print 'exp.cliente_id.id   '+str(exp.cliente_id.id)
+
+        if vals['estado'] == 'recibido':
+            vals['recibido'] = vals['qty']
+        else:
+            vals['emitido'] = vals['qty']
+
+        res = super(gastos_gastos,self).create(cr, uid, vals, context=context)
+        
+        
+
+        if len(self.pool.get('expedicion.contabilidad').search(cr, uid, [])) <1:
+                    raise osv.except_osv(_('Aviso'),_('Tienes que configurar la cuenta y el diario de contabilidad analitica antes de poder asignar costes)'))        
+
+
+        cl = cli.browse(cr, uid, vals['cliente'])
+
+        analytic_line = self.pool.get('account.analytic.line')
+        conta = self.pool.get('expedicion.contabilidad').browse(cr, uid,self.pool.get('expedicion.contabilidad').search(cr, uid, []) )[0]
+
+        if vals['type'] == 'gastos':
+            vals['qty'] = vals['qty'] * (-1)
+
+        values = {
+                    'name':vals['name'],
+                    'amount':vals['qty'],
+                    'account_id':conta.name.id,
+                    'general_account_id':cl.property_account_receivable.id,
+                    'date':datetime.now(),
+                    'journal_id':conta.diario.id,
+                  }
+
+        line_id = analytic_line.create(cr, uid, values)
+
+        self.write(cr, uid, res, {'ana_line':line_id})
+
+        gasto = self.browse(cr, uid, res)
+
+      
+
+        if gasto.expedicion_id:
+            gasto.expedicion_id.recalcular()    
+
+
+        return res 
+
+    _columns = {
+                'expedicion_id':fields.many2one('expediciones.expediciones','Expedición'),
+                'cliente':fields.many2one('res.partner','Cliente'),
+                'name':fields.char('Descripción', size=256),
+                'qty':fields.float('Cantidad', size=256),
+                'type':fields.selection([('gastos', 'Gastos'),
+                                    ('recuperaciones', 'Recuperaciones'),
+                                    ],'Tipo'),
+                'categ':fields.selection([('buque', 'Buque'),
+                                    ('mercancia', 'Mercancia'),
+                                    ],'Categoría'),
+                'ana_line':fields.many2one('account.analytic.line','Linea Analitica'),
+
+                'estado':fields.selection([('recibido', 'Recibido'),
+                                    ('emitido', 'Emitido'),
+                                    ],'Estado'),
+
+                'emitido':fields.float('Emitido'),
+                    
+                'recibido':fields.float('Recibido'),
+                }
+
+gastos_gastos()
+
+class expedicion_contabilidad(osv.osv):
+    _name= 'expedicion.contabilidad'
+
+    _columns = {
+                'name':fields.many2one('account.analytic.account','Cuenta analítica a la que se asignan los gastos de expediciones'),
+                'diario':fields.many2one('account.analytic.journal','Diario analítico'),
+                }
+
+expedicion_contabilidad()
+
+class expediciones_expediciones(osv.osv):
+    _name = 'expediciones.expediciones'
+
+
+    def recalcular(self, cr, uid, ids, context = None):
+        print 'RECALCULANDO'
+        if type(ids) == list:
+            ids = ids[0]   
+    
+        exp = self.browse(cr, uid, ids)
+    
+        tot_merc = 0
+        tot_buq  = 0
+        tot_exp  = 0
+ 
+        for fact in exp.facturas_line:
+            if fact.afecta == 'mercancias':
+                tot_merc = tot_merc +  fact.emitido
+                tot_merc = tot_merc -  fact.recibido
+            if fact.afecta == 'buque':
+                print 'buque '+str(fact.emitido)
+                tot_buq = tot_buq + fact.emitido
+                tot_buq = tot_buq - fact.recibido
+
+
+        for gast in exp.gastos_line:
+            if gast.categ == 'buque':
+                if gast.estado == 'emitido':
+                    tot_buq = tot_buq + gast.qty
+                else:
+                    tot_buq = tot_buq - gast.qty
+
+            if gast.categ == 'mercancia':
+                if gast.estado == 'emitido':
+                    tot_merc = tot_merc +  gast.qty
+                else:
+                    tot_merc = tot_merc -  gast.qty
+
+        if tot_merc > 0 or tot_buq > 0 :
+            exp.write({
+                        'resultado_mercaf': tot_merc,
+                        'resultado_buquesf': tot_buq,
+                        'resultado_expedicionf': tot_buq + tot_merc,
+                        })
+
+        return True
+
+    def cerrar(self, cr, uid, ids, context = None):
+
+        self.write(cr, uid, ids, {'cerrada':'Sí', 'fcerrada':datetime.now().strftime('%d-%m-%Y'), 'state':'cerrada'})        
+
+        return True
+
+    def abrir(self, cr, uid, ids, context = None):
+
+        self.write(cr, uid, ids, {'cerrada':'No', 'fcerrada':False, 'state':'abierta'})        
+
+        return True
+
+    _columns = {
+                    'name':fields.many2one('expediciones.referencia','Referencia'),
+                    'nexpedicion':fields.char('Numero de expedicion', size=256),
+                    'escala':fields.char('Nº de escala', size=256),
+                    'fecha':fields.date('Fecha'),
+                    'pas':fields.char('PAS', size=256),
+                    'mercancias':fields.many2one('product.product','Mercancia'),
+                    'kilos':fields.char('Kilos',size=512),
+                    'id_mercancias':fields.one2many('expediciones.mercancia','expedicion_id', 'Mercancias'),
+                    'cliente_id':fields.many2one('res.partner', 'Cliente'),
+                    'origen_id':fields.many2one('expediciones.puerto', 'Origen'),
+                    'destino_id':fields.many2one('expediciones.puerto', 'Destino'),
+                    'toperacion_id':fields.many2one('expediciones.toperacion', 'Tipo de operación'),
+                    'tdesplazamiento_id':fields.many2one('expediciones.tdesplazamiento', 'Tipo de desplazamiento'),
+                    'armador_id':fields.many2one('res.partner', 'Armador'),
+                    'fletador_id':fields.many2one('res.partner', 'Fletador'),
+                    'est_mercaf':fields.float('Estimación de mercancías', size=256),
+                    'est_buquesf':fields.float('Estimación de Buques estimado', size=256),
+                    'resultado_mercaf':fields.float('Resultado de las mercancias', size=256),
+                    'resultado_buquesf':fields.float('Resultado de los buques', size=256),
+                    'resultado_expedicionf':fields.float('Resultado de la expedición', size=256),
+                    'facturas':fields.one2many('account.invoice','expedicion_id', 'Facturas'),
+                    'facturas_line':fields.one2many('account.invoice.line','expedicion_id', 'Facturas'),
+                    'gastos_line':fields.one2many('gastos.gastos','expedicion_id', 'Gastos'),
+
+                    'state': fields.selection([('abierta', 'Abierta'),
+                                    ('cerrada', 'Cerrada'),
+                                    ],'Estado'),
+
+                    #Informe
+                    'informe_id':fields.many2one('expediciones.informe','Informe'),
+                    'informe2_id':fields.many2one('expediciones.informefil','Informe'),
+                    'cerrada':fields.char('Cerrada', size=256),
+                    'fcerrada':fields.date('Fecha Cierre', size=256),
+            
+
+                }
+    _defaults = {
+        'cerrada': 'No',
+        'state':'abierta',
+                }
+expediciones_expediciones()
+
+class expediciones_referencia(osv.osv):
+    _name='expediciones.referencia'
+    _columns = {
+                'name':fields.char('Referencia', size=264),
+                }
+
+expediciones_referencia()
+
+class expediciones_mercancia(osv.osv):
+    _name='expediciones.mercancia'
+    _columns = {
+                'name':fields.many2one('product.product','Producto'),
+                'cantidad':fields.float('Cantidad'),
+                'expedicion_id':fields.many2one('expediciones.expediciones','Expedición')
+                }
+
+expediciones_mercancia()
+
+class expediciones_toperacion(osv.osv):
+    _name='expediciones.toperacion'
+    _columns = {
+                'name':fields.char('Tipo de operación', size=256),
+                }
+
+expediciones_toperacion()
+
+class expediciones_puerto(osv.osv):
+    _name='expediciones.puerto'
+    _columns = {
+                'name':fields.char('Puerto', size=256),
+                }
+
+expediciones_puerto()
+
+class expediciones_tdesplazamiento(osv.osv):
+    _name='expediciones.tdesplazamiento'
+    _columns = {
+                'name':fields.char('Tipo de desplazamiento', size=256),
+                }
+
+expediciones_tdesplazamiento()
+
+# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

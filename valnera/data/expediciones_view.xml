@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+
+      <record id="gastos_gastos_search" model="ir.ui.view">
+      <field name="name">gastos_gastos.search.inherit</field>
+      <field name="model">gastos.gastos</field>
+      <field name="type">search</field>
+      <field name="arch" type="xml">
+      <search string="Gastos">
+                <group>
+		   <field name="name"/>
+		   <field name="cliente"/>
+                 </group>
+                 <newline/>
+                 <group string="Group By..." expand="1">
+		    <filter string="Cliente" context="{'group_by':'cliente'}" icon="terp-personal"/>
+		    <filter string="Expedición" context="{'group_by':'expedicion_id'}" icon="terp-gdu-smart-failing"/>
+		    <filter string="Categoría" context="{'group_by':'categ'}" icon="terp-folder-orange"/>
+                    <filter string="Tipo" context="{'group_by':'type'}" icon="terp-folder-green"/>
+                 </group>
+      </search>
+      </field>
+      </record>
+
+      <record id="gastos_gastos_form" model="ir.ui.view">
+      <field name="name">gastos_gastos.valnera.form</field>
+      <field name="model">gastos.gastos</field>
+      <field name="type">form</field>
+      <field name="arch" type="xml">
+	<form string="Gastos y Recuperaciones">
+	   <field name="cliente"/>
+  	   <field name="expedicion_id"/>
+	   <newline/>
+	   <field name="categ"/>
+	   <field name="type"/>
+	   <newline/>
+	   <field name="name"/>
+	   <field name="qty"/>
+	</form>
+      </field>
+    </record>
+
+      <record id="gastos_gastos_tree" model="ir.ui.view">
+      <field name="name">gastos_gastos.valnera.tree</field>
+      <field name="model">gastos.gastos</field>
+      <field name="type">tree</field>
+      <field name="arch" type="xml">
+	<tree string="Gastos y Recuperaciones">
+	   <field name="cliente"/>
+	   <field name="expedicion_id"/>
+	   <field name="type"/>
+  	   <field name="categ"/>
+	   <field name="name"/>
+	   <field name="qty"/>
+	</tree>
+      </field>
+    </record>
+
+<!--   -->
+
+      <record id="expediciones_expedicion_search" model="ir.ui.view">
+      <field name="name">expediciones_expediciones_form.valnera.search.inherit</field>
+      <field name="model">expediciones.expediciones</field>
+      <field name="type">search</field>
+      <field name="arch" type="xml">
+      <search string="Expediciones">
+                <group>
+		   <field name="name"/>
+  	   	   <field name="nexpedicion"/>		
+		   <field name="escala"/>
+		   <field name="pas"/>
+		   <field name="origen_id"/>
+                 <newline/>
+		   <field name="fecha"/>
+		   <field name="mercancias"/>	
+		   <field name="cliente_id"/>
+		   <field name="destino_id"/>
+                 </group>
+                 <group string="Group By..." expand="1">
+		    <filter string="Cliente" context="{'group_by':'cliente_id'}" icon="terp-personal"/>
+		    <filter string="Armador" context="{'group_by':'armador_id'}" icon="terp-folder-orange"/>
+                    <filter string="Fletador" context="{'group_by':'fletador_id'}" icon="terp-folder-green"/>
+                    <filter string="Origen" context="{'group_by':'origen_id'}" icon="terp-purchase"/>
+                    <filter string="Destino" context="{'group_by':'destino_id'}" icon="terp-sale"/>
+                 </group>
+      </search>
+      </field>
+      </record>
+
+      <record id="expediciones_expedicion_tree" model="ir.ui.view">
+      <field name="name">expediciones_expediciones_form.valnera.tree</field>
+      <field name="model">expediciones.expediciones</field>
+      <field name="type">tree</field>
+      <field name="arch" type="xml">
+	<tree string="Expediciones">
+	   <field name="name"/>
+	   <field name="nexpedicion"/>
+	   <field name="escala"/>
+	   <field name="pas"/>
+	   <field name="fecha"/>
+	   <field name="mercancias"/>
+	   <field name="cliente_id"/>
+	   <field name="origen_id"/>
+	   <field name="destino_id"/>
+	</tree>
+      </field>
+    </record>
+
+
+      <record id="expediciones_expedicion_form" model="ir.ui.view">
+      <field name="name">expediciones_expediciones_form.valnera.form</field>
+      <field name="model">expediciones.expediciones</field>
+      <field name="type">form</field>
+      <field name="arch" type="xml">
+	<form string="Expediciones" >
+	   <field name="name" widget="selection"/>
+           <field name="nexpedicion"/>
+	   <newline/>
+	   <field name="escala"/>	   
+	   <field name="fecha"/>
+	   <newline/>
+	   <field name="pas"/>
+	   <notebook colspan="4">
+		<page string="Datos Expedicion">
+			<field name="cliente_id"  domain="[('customer','=',True)]"/>
+		        <newline/>
+			<separator colspan="4" string="Cargamento" />
+		        <newline/>
+			<field name="mercancias" />
+			<field name="kilos" />
+		        <newline/>
+			<separator colspan="4" string="Puerto" />
+		        <newline/>
+	                <field name="origen_id"/>
+	                <field name="destino_id"/>
+		        <newline/>
+			<separator colspan="4" string="Categorización" />
+		        <newline/>
+	                <field name="toperacion_id" widget="selection"/>
+	                <field name="tdesplazamiento_id" widget="selection"/>
+		        <!--<newline/>
+			<separator colspan="4" string="Colaboradores" />
+		        <newline/>
+	                <field name="armador_id" widget="selection" domain="[('is_armador','=',True)]" invisible="1"/>
+	                <field name="fletador_id" widget="selection" domain="[('is_fletador','=',True)]" invisible="1"/>
+			-->
+		        <newline/>
+			<separator colspan="4" string="Estimaciones" />
+		        <newline/>
+	                <field name="est_mercaf"/>
+	                <field name="est_buquesf"/>
+		        <newline/>
+			<separator colspan="4" string="Resultado" />
+		        <newline/>
+	                <field name="resultado_mercaf" readonly="1"/>
+	                <field name="resultado_buquesf" readonly="1"/>
+		        <newline/>
+	                <field name="resultado_expedicionf" readonly="1"/>
+		        <newline/>
+			<separator colspan="4" string="Estado" />
+		        <newline/>
+			<field name="cerrada" readonly="1"/>
+			<field name="fcerrada" />
+			<separator colspan="2" />
+		        <newline/>
+			<field name="state" invisible="1"/>
+			<button string="Cerrar" name="cerrar" type="object" attrs="{'invisible':[('state','=','cerrada')]}"/>
+			<button string="Abrir" name="abrir" type="object" attrs="{'invisible':[('state','=','abierta')]}"/>
+			
+		</page>
+		<page string="Mercancias" invisible="1">
+			<field name="id_mercancias" colspan="4" nolabel="1">
+				<tree string="Mercancia" editable="top">
+					<field name="name"/>
+					<field name="cantidad"/>
+				</tree>
+				<form string="Mercancia" >
+					<field name="name"/>
+					<field name="cantidad"/>
+				</form>
+			</field>
+		</page>
+		<page string="Facturas">
+			<field name="facturas_line" colspan="4" nolabel="1" readonly="1" />
+		</page>		
+		<page string="Gastos y Recuperaciones">
+			<field name="gastos_line" colspan="4" nolabel="1" context="{'group_by' : 'type'}" >
+				<tree string="Gastos y Recuperaciones" >			
+				   <field name="type"/>
+			  	   <field name="categ"/>
+				   <field name="qty"/>
+				   <field name="name"/>
+				</tree>
+				<form string="Gastos y Recuperaciones" >			
+				   <field name="type"/>
+			  	   <field name="categ"/>
+				   <newline/>
+				   <field name="estado"/>
+				   <field name="qty"/>
+				   <newline/>
+				   <field name="name" colspan="4"/>
+				</form>
+			</field>
+		</page>	
+	   </notebook>
+	</form>
+      </field>
+    </record>
+
+
+	<record model="ir.actions.act_window" id="action_expediciones">
+            <field name="name">Expediciones</field>
+            <field name="res_model">expediciones.expediciones</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="expediciones_expedicion_search"/>
+        </record>
+
+	<record model="ir.actions.act_window" id="action_gastos">
+            <field name="name">Gastos y Recuperaciones</field>
+            <field name="res_model">gastos.gastos</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+	<record model="ir.actions.act_window" id="action_canalitica">
+            <field name="name">Cuenta analítica</field>
+            <field name="res_model">expedicion.contabilidad</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+	<record model="ir.actions.act_window" id="action_operaciones">
+            <field name="name">Tipos de operación</field>
+            <field name="res_model">expediciones.toperacion</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+     
+
+	<record model="ir.actions.act_window" id="action_ubicaciones">
+            <field name="name">Ubicaciones</field>
+            <field name="res_model">expediciones.puerto</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+	<record model="ir.actions.act_window" id="action_desplazamiento">
+            <field name="name">Tipos de desplazamiento</field>
+            <field name="res_model">expediciones.tdesplazamiento</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+	<record model="ir.actions.act_window" id="action_referencias">
+            <field name="name">Referencias</field>
+            <field name="res_model">expediciones.referencia</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+	<record model="ir.actions.act_window" id="action_expediciones">
+            <field name="name">Expediciones</field>
+            <field name="res_model">expediciones.expediciones</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="expediciones_expedicion_search"/>
+        </record>
+  
+     <menuitem icon="terp-stock_effects-object-colorize" id="menu_base_expediciones" name="Expediciones" sequence="0"
+                  web_icon="data/valnera2.png"
+                  web_icon_hover="data/valnera.png"/>
+
+    <menuitem id="menu_expediciones"      name="Expediciones"
+            parent="menu_base_expediciones"
+	    action="action_expediciones"
+            sequence="1"/>
+
+    <menuitem id="menu_gastos"      name="Gastos y Recuperaciones"
+            parent="menu_base_expediciones"
+	    action="action_gastos"
+            sequence="5"/>
+
+    <menuitem id="menu_expediciones_config"      name="Configuración"
+            parent="menu_base_expediciones"
+            sequence="10"/>
+
+    <menuitem id="menu_analit_config_ref"      name="Cuenta analítica"
+            parent="menu_expediciones_config"
+	    action="action_canalitica"
+            sequence="3"/>
+
+    <menuitem id="menu_expediciones_config_ref"      name="Referencias"
+            parent="menu_expediciones_config"
+	    action="action_referencias"
+            sequence="4"/>
+     
+    <menuitem id="menu_expediciones_config_ubi"      name="Puertos"
+            parent="menu_expediciones_config"
+	    action="action_ubicaciones"
+            sequence="8"/>
+
+    <menuitem id="menu_expediciones_config_op"      name="Tipo de operación"
+            parent="menu_expediciones_config"
+	    action="action_operaciones"
+            sequence="12"/>
+
+    <menuitem id="menu_expediciones_config_des"      name="Tipo de desplazamiento"
+            parent="menu_expediciones_config"
+	    action="action_desplazamiento"
+            sequence="16"/>
+
+
+
+
+  </data>
+</openerp>

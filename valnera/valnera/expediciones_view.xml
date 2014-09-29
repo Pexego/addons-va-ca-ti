@@ -1,0 +1,775 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+
+      <record id="gastos_gastos_search" model="ir.ui.view">
+      <field name="name">gastos_gastos.search.inherit</field>
+      <field name="model">gastos.gastos</field>
+      <field name="type">search</field>
+      <field name="arch" type="xml">
+      <search string="Gastos">
+                <group>
+		   <field name="name"/>
+		   <field name="cliente"/>
+                 </group>
+                 <newline/>
+                 <group string="Group By..." expand="1">
+		    <filter string="Cliente" context="{'group_by':'cliente'}" icon="terp-personal"/>
+		    <filter string="Expedición" context="{'group_by':'expedicion_id'}" icon="terp-gdu-smart-failing"/>
+		    <filter string="Categoría" context="{'group_by':'categ'}" icon="terp-folder-orange"/>
+                    <filter string="Estado" context="{'group_by':'estado'}" icon="terp-folder-green"/>
+                 </group>
+      </search>
+      </field>
+      </record>
+
+      <record id="gastos_gastos_form" model="ir.ui.view">
+      <field name="name">gastos_gastos.valnera.form</field>
+      <field name="model">gastos.gastos</field>
+      <field name="type">form</field>
+      <field name="arch" type="xml">
+	<form string="Gastos y Recuperaciones">
+	   <field name="cliente"/>
+  	   <field name="expedicion_id"/>
+	   <newline/>
+	   <field name="categ"/>
+	   <field name="estado"/>
+	   <field name="fecha"/>
+	   <newline/>
+	   <field name="name"/>
+	   <field name="qty"/>
+	   <newline/>
+	   <field name="asiento_contableb" />
+	   <field name="asiento_contable" readonly="1"/>	
+	</form>
+      </field>
+    </record>
+
+
+      <record id="expedicion_contabilidad_form" model="ir.ui.view">
+      <field name="name">gexpedicion.contabilidad.form</field>
+      <field name="model">expedicion.contabilidad</field>
+      <field name="type">form</field>
+      <field name="arch" type="xml">
+	<form string="Configuración contabilidad">
+	   <separator colspan="4" string="Fechas de factura" />
+	   <newline/>
+	   <field name="fmaxs"/>
+  	   <field name="fmaxps"/>
+	   <newline/>
+	   <separator colspan="4" string="Contabilidad Analitica" />
+	   <newline/>
+	   <field name="name"/>
+  	   <field name="diario"/>
+	   <newline/>
+	   <separator colspan="4" string="Contabilidad Financiera" />
+	   <newline/>
+  	   <field name="diariof"/>
+	   <newline/>
+	   <field name="cuentam"/>
+  	   <field name="cuentab"/>
+	   <newline/>
+	   <field name="cuentamr"/>
+  	   <field name="cuentabr"/>
+	   <newline/>
+	</form>
+      </field>
+    </record>
+
+      <record id="gastos_gastos_tree" model="ir.ui.view">
+      <field name="name">gastos_gastos.valnera.tree</field>
+      <field name="model">gastos.gastos</field>
+      <field name="type">tree</field>
+      <field name="arch" type="xml">
+	<tree string="Gastos y Recuperaciones">
+	   <field name="cliente"/>
+	   <field name="expedicion_id"/>
+	   <field name="fecha"/>
+  	   <field name="categ"/>
+	   <field name="estado"/>
+	   <field name="name"/>
+	   <field name="qty"/>
+	</tree>
+      </field>
+    </record>
+
+<!--   -->
+
+      <record id="expediciones_expedicion_search" model="ir.ui.view">
+      <field name="name">expediciones_expediciones_form.valnera.search.inherit</field>
+      <field name="model">expediciones.expediciones</field>
+      <field name="type">search</field>
+      <field name="arch" type="xml">
+      <search string="Expediciones">
+                <group>
+  	   	   <field name="name"/>	
+		   <field name="refe"/>	
+		   <field name="escala"/>
+		   <field name="pas"/>
+		   <field name="origen_id"/>
+                 <newline/>
+		   <field name="fecha"/>
+		   <field name="mercanciass"/>	
+		   <field name="cliente_id"/>
+		   <field name="destino_id"/>
+                 </group>
+                 <group string="Group By..." expand="1">
+		    <filter string="Cliente" context="{'group_by':'cliente_id'}" icon="terp-personal"/>
+                    <filter string="Origen" context="{'group_by':'origen_id'}" icon="terp-purchase"/>
+                    <filter string="Destino" context="{'group_by':'destino_id'}" icon="terp-sale"/>
+                 </group>
+      </search>
+      </field>
+      </record>
+
+      <record id="expediciones_expedicion_tree" model="ir.ui.view">
+      <field name="name">expediciones_expediciones_form.valnera.tree</field>
+      <field name="model">expediciones.expediciones</field>
+      <field name="type">tree</field>
+      <field name="arch" type="xml">
+	<tree string="Expediciones">
+	   <field name="name" width="75" string="Expedición"/>
+	   <field name="escala" width="75" string="Escala"/>
+	   <field name="refe" width="450"/>
+	   <field name="pas" width="75"/>
+	   <field name="fecha"/>
+	   <field name="mercanciass" width="350"/>
+	   <field name="cliente_id" width="350"/>
+	   <field name="origen_id" width="350"/>
+	   <field name="destino_id" width="350"/>
+	</tree>
+      </field>
+    </record>
+
+
+
+      <record id="expediciones_expedicion_form_aux" model="ir.ui.view">
+      <field name="name">expediciones_expediciones_form.valnera.form_aux</field>
+      <field name="model">expediciones.expediciones</field>
+      <field name="type">form</field>
+      <field name="arch" type="xml">
+	<form string="Expediciones" >
+	   <field name="name"  colspan="1"/>
+           <field name="refe"  colspan="2"/>
+	   <newline/>
+	   <field name="escala" colspan="1"/>	   
+	   <field name="fecha" colspan="1"/>
+	   <newline/>
+	   <field name="pas" colspan="1"/>
+	   <notebook colspan="4">
+		<page string="Datos Expedicion">
+			<field name="cliente_id"  domain="[('customer','=',True)]"/>
+		        <newline/>
+			<separator colspan="4" string="Cargamento" />
+		        <newline/>
+			<field name="mercanciass" />
+			<field name="kilos" />
+		        <newline/>
+			<separator colspan="4" string="Puerto" />
+		        <newline/>
+	                <field name="origen_id"/>
+	                <field name="destino_id"/>
+		        <newline/>
+			<separator colspan="4" string="Categorización" />
+		        <newline/>
+	                <field name="toperacion_id" widget="selection"/>
+	                <field name="tdesplazamiento_id" widget="selection"/>
+		        <!--<newline/>
+			<separator colspan="4" string="Colaboradores" />
+		        <newline/>
+	                <field name="armador_id" widget="selection" domain="[('is_armador','=',True)]" invisible="1"/>
+	                <field name="fletador_id" widget="selection" domain="[('is_fletador','=',True)]" invisible="1"/>
+			-->
+		        <newline/>
+			<separator colspan="4" string="Estimaciones" />
+		        <newline/>
+	                <field name="est_mercaf"/>
+	                <field name="est_buquesf"/>
+		        <newline/>
+			<separator colspan="4" string="Resultado" />
+		        <newline/>
+	                <field name="resultado_mercaf" readonly="1"/>
+	                <field name="resultado_buquesf" readonly="1"/>
+		        <newline/>
+	                <field name="resultado_expedicionf" readonly="1"/>
+			
+			
+			
+		</page>
+		<page string="Mercancias" invisible="1">
+			<field name="id_mercancias" colspan="4" nolabel="1">
+				<tree string="Mercancia" editable="top">
+					<field name="name"/>
+					<field name="cantidad"/>
+				</tree>
+				<form string="Mercancia" >
+					<field name="name"/>
+					<field name="cantidad"/>
+				</form>
+			</field>
+		</page>
+		<page string="Facturas">
+		<newline/>
+		<group >
+		<field name="afecta" nolabel="1" on_change="ch_op(agrupar, afecta)" />
+		<field name="agrupar" on_change="ch_op(agrupar, afecta)" />
+		<separator />	
+		<field name="op" invisible="1" />	
+		</group>
+		<newline/>
+			
+			<field name="facturas_line" colspan="4" nolabel="1" readonly="1"  attrs="{'invisible':[('op','!=',1)]}" >
+				<tree string="">
+				    <field name="nfactura" />
+				    <field name="ffactura" />
+				    <field name="name" />
+				    <field name="partner_id" />
+				    <field name="estado" />
+				    <field name="afecta" />
+				    <field name="recibido"  />
+				    <field name="emitido"  />
+				    <field name="price_subtotal"  invisible="1"/>
+				    <button name="sacar_factura" type="object" string="Ver factura" icon="terp-tools"/>
+				</tree>
+			</field>
+			<field name="facturas_line2" colspan="4" nolabel="1" readonly="1"  attrs="{'invisible':[('op','!=',2)]}">
+				<tree string="">
+				    <field name="nfactura" />
+				    <field name="ffactura" />
+				    <field name="name" />
+				    <field name="partner_id" />
+				    <field name="estado" />
+				    <field name="afecta" />
+				    <field name="recibido" />
+				    <field name="emitido"  />
+				    <field name="price_subtotal"  invisible="1"/>
+				    <button name="sacar_factura" type="object" string="Ver factura" icon="terp-tools"/>
+				</tree>
+			</field>
+			<field name="facturas_line3" colspan="4" nolabel="1" readonly="1"  attrs="{'invisible':[('op','!=',3)]}">
+				<tree string="">
+				    <field name="nfactura" />
+				    <field name="ffactura" />
+				    <field name="name" />
+				    <field name="partner_id" />
+				    <field name="estado" />
+				    <field name="afecta" />
+				    <field name="recibido"  />
+				    <field name="emitido" />
+				    <field name="price_subtotal" sum="Total" invisible="1"/>
+				    <button name="sacar_factura" type="object" string="Ver factura" icon="terp-tools"/>
+				</tree>
+			</field>
+
+<!-- Con agrupàmiento -->
+
+			<field name="facturas_line4" colspan="4" nolabel="1" readonly="1" attrs="{'invisible':[('op','!=',4)]}" context="{'group_by':'nfactura'}">
+				<tree string="">
+				    <field name="nfactura" />
+				    <field name="ffactura" />
+				    <field name="name" />
+				    <field name="partner_id" />
+				    <field name="estado" />
+				    <field name="afecta" />
+				    <field name="recibido"  />
+				    <field name="emitido" />
+				    <field name="price_subtotal" invisible="1"/>
+				    <button name="sacar_factura" type="object" string="Ver factura" icon="terp-tools"/>
+				</tree>
+			</field>
+			<field name="facturas_line5" colspan="4" nolabel="1" readonly="1"  attrs="{'invisible':[('op','!=',5)]}" context="{'group_by':'nfactura'}">
+				<tree string="">
+				    <field name="nfactura" />
+				    <field name="ffactura" />
+				    <field name="name" />
+				    <field name="partner_id" />
+				    <field name="estado" />
+				    <field name="afecta" />
+				    <field name="recibido"  />
+				    <field name="emitido" />
+				    <field name="price_subtotal" invisible="1"/>
+				    <button name="sacar_factura" type="object" string="Ver factura" icon="terp-tools"/>
+				</tree>
+			</field>
+			<field name="facturas_line6" colspan="4" nolabel="1" readonly="1"  attrs="{'invisible':[('op','!=',6)]}" context="{'group_by':'nfactura'}">
+				<tree string="">
+				    <field name="nfactura" />
+				    <field name="ffactura" />
+				    <field name="name" />
+				    <field name="partner_id" />
+				    <field name="estado" />
+				    <field name="afecta" />
+				    <field name="recibido"  />
+				    <field name="emitido"  />
+				    <field name="price_subtotal" invisible="1"/>
+				    <button name="sacar_factura" type="object" string="Ver factura" icon="terp-tools"/>
+				</tree>
+			</field>
+
+
+
+			<field name="facturas_line7" colspan="4" nolabel="1" readonly="1"  attrs="{'invisible':[('op','!=',7)]}" >
+				<tree string="">
+				    <field name="nfactura" />
+				    <field name="ffactura" />
+				    <field name="name" />
+				    <field name="partner_id" />
+				    <field name="estado" />
+				    <field name="afecta" />
+				    <field name="recibido"  />
+				    <field name="emitido"  />
+				    <field name="price_subtotal"  invisible="1"/>
+				    <button name="sacar_factura" type="object" string="Ver factura" icon="terp-tools"/>
+				</tree>
+			</field>
+
+			<field name="facturas_line8" colspan="4" nolabel="1" readonly="1"  attrs="{'invisible':[('op','!=',8)]}" context="{'group_by':'nfactura'}">
+				<tree string="">
+				    <field name="nfactura" />
+				    <field name="ffactura" />
+				    <field name="name" />
+				    <field name="partner_id" />
+				    <field name="estado" />
+				    <field name="afecta" />
+				    <field name="recibido"  />
+				    <field name="emitido"  />
+				    <field name="price_subtotal"  invisible="1"/>
+				    <button name="sacar_factura" type="object" string="Ver factura" icon="terp-tools"/>
+				</tree>
+			</field>
+
+
+		<!--Totales -->
+			<group >
+				<separator colspan="2"/>
+			</group >
+			<group>
+			<!--Todo -->
+			<field name="resultado_buquesfc" attrs="{'invisible':[('op','not in',[1,4])]}" colspan="1"/>
+			<field name="resultado_mercafc" attrs="{'invisible':[('op','not in',[1,4])]}" colspan="1"/>
+			<field name="tot_buq_f" attrs="{'invisible':[('op','not in',[1,4])]}" colspan="1"/>
+			<newline/>
+			<!--Mercancias -->
+			<field name="resultado_mercafr" attrs="{'invisible':[('op','not in',[3,6])]}" colspan="1"/>
+			<field name="resultado_mercafe" attrs="{'invisible':[('op','not in',[3,6])]}" colspan="1"/>
+			<field name="resultado_mercaff" attrs="{'invisible':[('op','not in',[3,6])]}" colspan="1"/>
+			<newline/>
+			<!--Buques -->
+			<field name="resultado_buquesfr" attrs="{'invisible':[('op','not in',[2,5])]}" colspan="1"/>
+			<field name="resultado_buquesfe" attrs="{'invisible':[('op','not in',[2,5])]}" colspan="1"/>
+			<field name="resultado_buquesff" attrs="{'invisible':[('op','not in',[2,5])]}" colspan="1"/>
+			<newline/>
+
+			<!--No -->
+			<field name="tot_fact_no_reci" attrs="{'invisible':[('op','not in',[7,8])]}" colspan="1"/>
+			<field name="tot_fact_no_emi" attrs="{'invisible':[('op','not in',[7,8])]}" colspan="1"/>
+			<field name="tot_fact_no" attrs="{'invisible':[('op','not in',[7,8])]}" colspan="1"/>
+			</group >
+
+<!-- Gastos -->		
+		</page>	
+		<page string="Gastos y Recuperaciones">
+		<field name="afectag" nolabel="1" on_change="ch_opg(afectag)" colspan="1"/>	
+		<field name="opg" invisible="1" colspan="1"/>
+		<separator colspan="3"/>	
+		<newline/>
+			<field name="gastos_line" colspan="4" nolabel="1"   attrs="{'readonly':[('cerrada','=','Sí')],'invisible':[('opg','!=',1)]}" >
+				<tree string="Gastos y Recuperaciones" >		
+			  	   <field name="ffecha"/>
+				   <field name="name"/>
+				   <field name="cliente"/>
+				   <field name="categ"/>
+				    <field name="recibido"  />
+				    <field name="emitido"  />
+				    <field name="qty"  invisible="1"/>
+				   <field name="asentado" />
+				</tree>
+				<form string="Gastos y Recuperaciones" >		
+				   <field name="fecha"/>
+			  	   <field name="categ"/>
+				   <newline/>
+				   <field name="estado"/>
+				   <field name="qty"/>
+				   <newline/>
+				   <field name="name" colspan="4"/>
+				   <newline/>
+				   <field name="asiento_contableb" />
+				   <newline/>
+				   <field name="asiento_contable" readonly="1"/>
+				   <field name="asentado" readonly="1"/>	
+				</form>
+			</field>
+
+			<field name="gastos_line2" colspan="4" nolabel="1"   attrs="{'readonly':[('cerrada','=','Sí')],'invisible':[('opg','!=',2)]}">
+				<tree string="Gastos y Recuperaciones" >		
+			  	   <field name="ffecha"/>
+				   <field name="name"/>
+				   <field name="cliente"/>
+				   <field name="categ"/>
+				    <field name="recibido"  />
+				    <field name="emitido" />
+				    <field name="qty" invisible="1"/>
+				   <field name="asentado" />
+				</tree>
+				<form string="Gastos y Recuperaciones" >		
+				   <field name="fecha"/>
+			  	   <field name="categ"/>
+				   <newline/>
+				   <field name="estado"/>
+				   <field name="qty"/>
+				   <newline/>
+				   <field name="name" colspan="4"/>
+				   <newline/>
+				   <field name="asiento_contableb" />
+				   <newline/>
+				   <field name="asiento_contable" readonly="1"/>
+				   <field name="asentado" readonly="1"/>	
+				</form>
+			</field>
+
+
+			<field name="gastos_line3" colspan="4" nolabel="1"   attrs="{'readonly':[('cerrada','=','Sí')],'invisible':[('opg','!=',3)]}">
+				<tree string="Gastos y Recuperaciones" >		
+			  	   <field name="ffecha"/>
+				   <field name="name"/>
+				   <field name="cliente"/>
+				   <field name="categ"/>
+				    <field name="recibido"  />
+				    <field name="emitido" />
+				    <field name="qty" invisible="1"/>
+				   <field name="asentado" />
+				</tree>
+				<form string="Gastos y Recuperaciones" >		
+				   <field name="fecha"/>
+			  	   <field name="categ"/>
+				   <newline/>
+				   <field name="estado"/>
+				   <field name="qty"/>
+				   <newline/>
+				   <field name="name" colspan="4"/>
+				   <newline/>
+				   <field name="asiento_contableb" />
+				   <newline/>
+				   <field name="asiento_contable" readonly="1"/>
+				   <field name="asentado" readonly="1"/>	
+				</form>
+			</field>
+
+			<field name="gastos_line4" colspan="4" nolabel="1"   attrs="{'readonly':[('cerrada','=','Sí')],'invisible':[('opg','!=',4)]}">
+				<tree string="Gastos y Recuperaciones" >		
+			  	   <field name="ffecha"/>
+				   <field name="name"/>
+				   <field name="cliente"/>
+				   <field name="categ"/>
+				    <field name="recibido" />
+				    <field name="emitido" />
+				    <field name="qty" />
+				   <field name="asentado" />
+				</tree>
+				<form string="Gastos y Recuperaciones" >		
+				   <field name="fecha"/>
+			  	   <field name="categ"/>
+				   <newline/>
+				   <field name="estado"/>
+				   <field name="qty"/>
+				   <newline/>
+				   <field name="name" colspan="4"/>
+				   <newline/>
+				   <field name="asiento_contableb" />
+				   <newline/>
+				   <field name="asiento_contable" readonly="1"/>
+				   <field name="asentado" readonly="1"/>	
+				</form>
+			</field>
+<!--  totales -->	
+			<group >
+				<separator colspan="2"/>
+			</group >
+			<group >
+			<group   attrs="{'readonly':[('cerrada','=','Sí')],'invisible':[('opg','!=',1)]}" >
+				<field name="tot_gast_reci" colspan="1"	/>
+				<field name="tot_gast_emi" colspan="1"/>
+				<field name="tot_gast" colspan="1"/>
+			</group >
+			<group   attrs="{'readonly':[('cerrada','=','Sí')],'invisible':[('opg','!=',3)]}" >
+				<field name="tot_gast_reci_merca" colspan="1"/>
+				<field name="tot_gast_emi_merca" colspan="1"/>
+				<field name="tot_gast_merca" colspan="1"/>
+			</group >
+			<group   attrs="{'readonly':[('cerrada','=','Sí')],'invisible':[('opg','!=',2)]}" >
+				<field name="tot_gast_reci_buque" colspan="1"/>
+				<field name="tot_gast_emi_buque" colspan="1"/>
+				<field name="tot_gast_buque" colspan="1"/>
+			</group >
+			<group   attrs="{'readonly':[('cerrada','=','Sí')],'invisible':[('opg','!=',4)]}" >
+				<field name="tot_gast_reci_no" colspan="1"/>
+				<field name="tot_gast_emi_no" colspan="1"/>
+				<field name="tot_gast_no" colspan="1"/>
+			</group >
+		 	</group>
+
+
+		</page>	
+	   </notebook>
+	</form>
+      </field>
+    </record>
+
+      <record id="expediciones_expedicion_form" model="ir.ui.view">
+      <field name="name">expediciones_expediciones_form.valnera.form</field>
+      <field name="model">expediciones.expediciones</field>
+      <field name="type">form</field>
+      <field name="arch" type="xml">
+	<form string="Expediciones" >
+	   <field name="name" />
+           <field name="refe" />
+	   <newline/>
+	   <field name="escala"/>	   
+	   <field name="fecha"/>
+	   <newline/>
+	   <field name="pas"/>
+	   <notebook colspan="4">
+		<page string="Datos Expedicion">
+			<field name="cliente_id"  domain="[('customer','=',True)]"/>
+		        <newline/>
+			<separator colspan="4" string="Cargamento" />
+		        <newline/>
+			<field name="mercanciass" />
+			<field name="kilos" />
+		        <newline/>
+			<separator colspan="4" string="Puerto" />
+		        <newline/>
+	                <field name="origen_id"/>
+	                <field name="destino_id"/>
+		        <newline/>
+			<separator colspan="4" string="Categorización" />
+		        <newline/>
+	                <field name="toperacion_id" widget="selection"/>
+	                <field name="tdesplazamiento_id" widget="selection"/>
+		        <!--<newline/>
+			<separator colspan="4" string="Colaboradores" />
+		        <newline/>
+	                <field name="armador_id" widget="selection" domain="[('is_armador','=',True)]" invisible="1"/>
+	                <field name="fletador_id" widget="selection" domain="[('is_fletador','=',True)]" invisible="1"/>
+			-->
+		        <newline/>
+			<separator colspan="4" string="Estimaciones" />
+		        <newline/>
+	                <field name="est_mercaf"/>
+	                <field name="est_buquesf"/>
+		        <newline/>
+			<separator colspan="4" string="Resultado" />
+		        <newline/>
+	                <field name="resultado_mercaf" readonly="1"/>
+	                <field name="resultado_buquesf" readonly="1"/>
+		        <newline/>
+	                <field name="resultado_expedicionf" readonly="1"/>
+		        <newline/>
+			<separator colspan="4" string="Estado" />
+		        <newline/>
+			<field name="cerrada" readonly="1"/>
+			<field name="fcerrada" />
+			<separator colspan="2" />
+		        <newline/>
+			<field name="state" invisible="1"/>
+			<button string="Cerrar" name="cerrar" type="object" attrs="{'invisible':[('state','=','cerrada')]}"/>
+			<button string="Abrir" name="abrir" type="object" attrs="{'invisible':[('state','=','abierta')]}"/>
+			
+		</page>
+		<page string="Mercancias" invisible="1">
+			<field name="id_mercancias" colspan="4" nolabel="1">
+				<tree string="Mercancia" editable="top">
+					<field name="name"/>
+					<field name="cantidad"/>
+				</tree>
+				<form string="Mercancia" >
+					<field name="name"/>
+					<field name="cantidad"/>
+				</form>
+			</field>
+		</page>
+		<page string="Facturas">
+		<newline/>
+		<field name="agrupar" />
+		<field name="afecta" nolabel="1" />	
+		<newline/>
+			
+			<field name="facturas_line" colspan="4" nolabel="1" readonly="1"  >
+				<tree>
+				    <field name="nfactura" />
+				    <field name="ffactura" />
+				    <field name="name" />
+				    <field name="partner_id" />
+				    <field name="estado" />
+				    <field name="afecta" />
+				    <field name="recibido" />
+				    <field name="emitido" />
+				    <button name="sacar_factura" type="object" string="Ver factura" icon="terp-tools"/>
+				</tree>
+			</field>
+
+		<field name="resultado_mercaff" readonly="1" />
+		<field name="resultado_buquesff" readonly="1" />
+		</page>		
+		<page string="Gastos y Recuperaciones">
+		<field name="resultado_mercafg" readonly="1" />
+		<field name="resultado_buquesfg" readonly="1" />
+		<newline/>
+			<field name="gastos_line" colspan="4" nolabel="1"   attrs="{'readonly':[('cerrada','=','Sí')]}">
+				<tree string="Gastos y Recuperaciones" >		
+			  	   <field name="ffecha"/>
+				   <field name="name"/>
+				   <field name="cliente"/>
+				   <field name="categ"/>
+				   <field name="recibido"/>
+				   <field name="emitido"/>
+				   <field name="asentado" />
+				</tree>
+				<form string="Gastos y Recuperaciones" >		
+				   <field name="fecha"/>
+			  	   <field name="categ"/>
+				   <newline/>
+				   <field name="estado"/>
+				   <field name="qty"/>
+				   <newline/>
+				   <field name="name" colspan="4"/>
+				   <newline/>
+				   <field name="asiento_contableb" />
+				   <newline/>
+				   <field name="asiento_contable" readonly="1"/>
+				   <field name="asentado" readonly="1"/>	
+				</form>
+			</field>
+		</page>	
+	   </notebook>
+	</form>
+      </field>
+    </record>
+
+
+	<record model="ir.actions.act_window" id="action_expediciones">
+            <field name="name">Expediciones</field>
+            <field name="res_model">expediciones.expediciones</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="expediciones_expedicion_tree"/>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="expediciones_expedicion_search"/>
+        </record>
+
+	<record model="ir.actions.act_window" id="action_expediciones_aux">
+            <field name="name">Expediciones</field>
+            <field name="res_model">expediciones.expediciones</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="expediciones_expedicion_form_aux"/>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="expediciones_expedicion_search"/>
+        </record>
+
+	<record model="ir.actions.act_window" id="action_gastos">
+            <field name="name">Gastos y Recuperaciones</field>
+            <field name="res_model">gastos.gastos</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+	<record model="ir.actions.act_window" id="action_canalitica">
+            <field name="name">Contabilidad</field>
+            <field name="res_model">expedicion.contabilidad</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+	<record model="ir.actions.act_window" id="action_operaciones">
+            <field name="name">Tipos de operación</field>
+            <field name="res_model">expediciones.toperacion</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+     
+
+	<record model="ir.actions.act_window" id="action_ubicaciones">
+            <field name="name">Ubicaciones</field>
+            <field name="res_model">expediciones.puerto</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+	<record model="ir.actions.act_window" id="action_desplazamiento">
+            <field name="name">Tipos de desplazamiento</field>
+            <field name="res_model">expediciones.tdesplazamiento</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+	<record model="ir.actions.act_window" id="action_referencias">
+            <field name="name">Referencias</field>
+            <field name="res_model">expediciones.referencia</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+	<record model="ir.actions.act_window" id="action_expediciones">
+            <field name="name">Expediciones</field>
+            <field name="res_model">expediciones.expediciones</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="expediciones_expedicion_search"/>
+        </record>
+  
+     <menuitem icon="terp-stock_effects-object-colorize" id="menu_base_expediciones" name="Expediciones" sequence="0"
+                  web_icon="data/valnera2.png"
+                  web_icon_hover="data/valnera.png"/>
+
+    <menuitem id="menu_expediciones"      name="Expediciones"
+            parent="menu_base_expediciones"
+	    action="action_expediciones"
+            sequence="1"/>
+
+    <menuitem id="menu_expediciones_aux"      name="Expediciones"
+            parent="menu_base_expediciones"
+	    action="action_expediciones"
+            sequence="2"/>
+
+    <menuitem id="menu_gastos"      name="Gastos y Recuperaciones"
+            parent="menu_base_expediciones"
+	    action="action_gastos"
+            sequence="5"/>
+
+    <menuitem id="menu_expediciones_config"      name="Configuración"
+            parent="menu_base_expediciones"
+            sequence="10"/>
+
+    <menuitem id="menu_analit_config_ref"      name="Contabilidad"
+            parent="menu_expediciones_config"
+	    action="action_canalitica"
+            sequence="3"/>
+<!--
+    <menuitem id="menu_expediciones_config_ref"      name="Referencias"
+            parent="menu_expediciones_config"
+	    action="action_referencias"
+            sequence="4"/> -->
+     
+    <menuitem id="menu_expediciones_config_ubi"      name="Puertos"
+            parent="menu_expediciones_config"
+	    action="action_ubicaciones"
+            sequence="8"/>
+
+    <menuitem id="menu_expediciones_config_op"      name="Tipo de operación"
+            parent="menu_expediciones_config"
+	    action="action_operaciones"
+            sequence="12"/>
+
+    <menuitem id="menu_expediciones_config_des"      name="Tipo de desplazamiento"
+            parent="menu_expediciones_config"
+	    action="action_desplazamiento"
+            sequence="16"/>
+
+
+
+
+  </data>
+</openerp>

@@ -1,0 +1,198 @@
+# -*- coding: utf-8 -*-
+##############################################################################
+#
+#    OpenERP, Open Source Management Solution
+#    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+##############################################################################
+
+from osv import fields, osv
+from tools.translate import _
+import time
+
+class expediciones_informe(osv.osv):
+    _name = 'expediciones.informe'
+
+    def generar_informe(self, cr, uid, ids, context=None):
+        expediciones = self.pool.get('expediciones.expediciones')
+        nm = 'Informe de expediciones '      
+
+        inf = self.browse(cr, uid, ids)[0]
+
+        for ex in inf.expediciones:
+            ex.write({'informe_id':False})
+
+        for ex in expediciones.browse(cr, uid, expediciones.search(cr, uid, [('fecha','>=',inf.fecha1),('fecha','<=',inf.fecha2)])):            
+            ex.write({'informe_id':inf.id})
+
+        nm = nm + 'entre las fechas '+str(inf.fecha1)+' y '+str(inf.fecha2)
+        inf.write({'name':nm})
+        return True
+
+    _columns = {
+                    'name':fields.char('Nombre informe', size=256),
+                    'fecha1':fields.date('Desde'),
+                    'fecha2':fields.date('Hasta'),
+                    'expediciones':fields.one2many('expediciones.expediciones','informe_id', 'Expediciones'),
+                   
+
+                }
+
+expediciones_informe()
+
+
+####################     INFORME 2
+
+class expediciones_informefil(osv.osv):
+    _name = 'expediciones.informefil'
+
+    def generar_informe(self, cr, uid, ids, context=None):
+        expediciones = self.pool.get('expediciones.expediciones')
+        
+        inf = self.browse(cr, uid, ids)[0]
+
+        for ex in inf.expediciones:
+            ex.write({'informe2_id':False})
+
+        expediciones_ids = expediciones.search(cr, uid, [])
+        
+        escribir = False        
+        
+        nm = 'Informe de expediciones '        
+
+        if inf.fecha1 and inf.fecha2:    
+            expediciones_ids = expediciones.search(cr, uid, [('fecha','>=',inf.fecha1),('fecha','<=',inf.fecha2)] )
+            nm = nm + 'entre las fechas '+str(inf.fecha1)+' y '+str(inf.fecha2)
+            escribir = True
+
+       
+        if inf.mercancia: 
+            escribir = True   
+            expediciones_ids = expediciones.search(cr, uid, [('mercancias','=',inf.mercancia.id),('id','in',expediciones_ids)] )
+            nm = nm + ', de la mercancía '+str(inf.mercancia.name)
+
+        if inf.cliente: 
+            escribir = True   
+            expediciones_ids = expediciones.search(cr, uid, [('cliente_id','=',inf.cliente.id),('id','in',expediciones_ids)] )
+            nm = nm + ', del cliente '+str(inf.cliente.name)
+
+########################
+        if inf.mes and inf.anio: 
+            escribir = True   
+    
+            mes =   int(inf.mes) +1
+            anio = inf.anio
+
+            if mes == 13:
+                mes = 1
+                anio= int(anio) +1
+
+            fecha1 = time.strftime(str(inf.anio)+'-'+str(inf.mes)+'-01'),
+            fecha2 = time.strftime(str(anio)+'-'+str(int(mes) )+'-01'),
+
+            expediciones_ids = expediciones.search(cr, uid, [('fecha','>=',fecha1),('fecha','<',fecha2),('id','in',expediciones_ids)] )
+            nm = nm + ', del mes '+str(inf.mes)+'-'+str(inf.anio) 
+########################
+
+        if escribir:
+            for ex in expediciones.browse(cr, uid, expediciones_ids):
+                ex.write({'informe2_id':inf.id})
+                inf.write({'name':nm})
+    
+        return True
+
+    _columns = {
+                    'name':fields.char('Nombre informe', size=256),
+                    'cliente':fields.many2one('res.partner','Cliente'),
+                    'mercancia':fields.many2one('product.product','Mercancia'),
+                    'mes': fields.selection([('1', 'Enero'),
+                                    ('2', 'Febrero'),
+                                    ('3', 'Marzo'),
+                                    ('4', 'Abril'),
+                                    ('5', 'Mayo'),
+                                    ('6', 'Junio'),
+                                    ('7', 'Julio'),
+                                    ('8', 'Agosto'),
+                                    ('9', 'Septiembre'),
+                                    ('10', 'Octubre'),
+                                    ('11', 'Noviembre'),
+                                    ('12', 'Diciembre'),
+                                    ],'Mes'),
+                    'anio': fields.selection([('2010', '2010'),
+                                    ('2011', '2011'),
+                                    ('2012', '2012'),
+                                    ('2013', '2013'),
+                                    ('2014', '2014'),
+                                    ('2015', '2015'),
+                                    ('2016', '2016'),
+                                    ('2017', '2017'),
+                                    ('2018', '2018'),
+                                    ('2019', '2019'),
+                                    ('2020', '2020'),
+                                    ('2021', '2021'),
+                                    ('2022', '2022'),
+                                    ('2023', '2023'),
+                                    ('2024', '2024'),
+                                    ('2025', '2025'),
+                                    ('2026', '2026'),
+                                    ('2027', '2027'),
+                                    ('2028', '2028'),
+                                    ('2029', '2029'),
+                                    ('2030', '2030'),
+                                    ('2031', '2031'),
+                                    ('2032', '2032'),
+                                    ('2033', '2033'),
+                                    ('2034', '2034'),
+                                    ('2035', '2035'),
+                                    ('2036', '2036'),
+                                    ('2037', '2037'),
+                                    ('2038', '2038'),
+                                    ('2039', '2039'),
+                                    ('2040', '2040'),
+                                    ('2041', '2041'),
+                                    ('2042', '2042'),
+                                    ('2043', '2043'),
+                                    ('2044', '2044'),
+                                    ('2045', '2045'),
+                                    ('2046', '2046'),
+                                    ('2047', '2047'),
+                                    ('2048', '2048'),
+                                    ('2049', '2049'),
+                                    ('2050', '2050'),
+                                    ('2051', '2051'),
+                                    ('2052', '2052'),
+                                    ('2053', '2053'),
+                                    ('2054', '2054'),
+                                    ('2055', '2055'),
+                                    ('2056', '2056'),
+                                    ('2057', '2057'),
+                                    ('2058', '2058'),
+                                    ('2059', '2059'),
+                                    ('2060', '2060'),
+                                    ],'Año'),
+                    'fecha1':fields.date('Desde'),
+                    'fecha2':fields.date('Hasta'),
+                    'expediciones':fields.one2many('expediciones.expediciones','informe2_id', 'Expediciones'),
+           
+                   
+
+                }
+
+expediciones_informefil()
+
+
+
+# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

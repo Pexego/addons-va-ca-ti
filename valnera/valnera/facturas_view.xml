@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+    <!--
+    Partners Extension
+  -->
+
+    <record id="account_invoice_valnera_form" model="ir.ui.view">
+      <field name="name">account.invoice_form.valnera.form.inherit</field>
+      <field name="model">account.invoice</field>
+      <field name="type">form</field>
+      <field name="inherit_id" ref="account.invoice_form"/>
+      <field name="arch" type="xml">
+	<field name="name" position="after">
+	    <field name="expedicion_id" on_change="ch_ex(expedicion_id)"  attrs="{'readonly':[('state','in',('open','cancel','paid'))]}" />
+	    <field name="nescala" on_change="ch_es(nescala)"  attrs="{'readonly':[('state','in',('open','cancel','paid'))]}" />
+	    <field name="afecta" required="1"  attrs="{'readonly':[('state','in',('open','cancel','paid'))]}" />	
+	    <button name="sobreescribir_exp" string="Reasignar Expedición" icon="terp-tools" type="object"  attrs="{'readonly':[('state','in',('open','cancel','paid'))]}"/>    
+	</field>
+	<notebook position="inside">
+		<page string="Datos"  attrs="{'readonly':[('state','in',('open','cancel','paid'))]}">
+			<field name="texto"  colspan="4"/>	
+			<field name="anexos"  colspan="4"/>			
+			<separator string="Referencias" colspan="4"/>
+			<newline/>
+			<group colspan="4">
+			<field name="ref1"  nolabel="1" colspan="1"/>
+			<field name="ref2" nolabel="1" colspan="1"/>
+			<field name="ref3"  nolabel="1" colspan="1"/>
+			<newline/>
+			<field name="ref4" nolabel="1" colspan="1"/>
+			<field name="ref5"  nolabel="1" colspan="1"/>
+			<field name="ref6" nolabel="1" colspan="1"/>
+			<newline/>
+			<field name="ref7"  nolabel="1" colspan="1"/>
+			<field name="ref8" nolabel="1" colspan="1"/>
+			<field name="ref9"  nolabel="1" colspan="1"/>
+			<newline/>
+			<field name="ref10" nolabel="1" colspan="1"/>
+			<field name="ref11"  nolabel="1" colspan="1"/>
+			<field name="ref12" nolabel="1"  colspan="1"/>
+			</group>
+		</page>
+	</notebook>
+      </field>
+    </record>
+
+
+
+    <record id="view_invoice_line_form_inh_form" model="ir.ui.view">
+      <field name="name">account.view.invoice.line.form.form.inherit</field>
+      <field name="model">account.invoice.line</field>
+      <field name="type">form</field>
+      <field name="inherit_id" ref="account.view_invoice_line_form"/>
+      <field name="arch" type="xml">
+	<field name="discount" position="after">
+	    <field name="expedicion_id" on_change="ch_ex(expedicion_id)" invisible="1"/>
+	    <field name="expedicion_id_aux" on_change="ch_ex(expedicion_id_aux)"/>
+	    <field name="nescala" on_change="ch_es(nescala)"/>
+	    <field name="afecta"/>	    
+	    
+	</field>
+      </field>
+    </record>
+
+<!-- PROVEEDORES  -->
+
+    <record id="account_invoice_sup_valnera_form" model="ir.ui.view">
+      <field name="name">account.invoice_sup_form.valnera.form.inherit</field>
+      <field name="model">account.invoice</field>
+      <field name="type">form</field>
+      <field name="inherit_id" ref="account.invoice_supplier_form"/>
+      <field name="arch" type="xml">
+	<field name="partner_id" position="before">
+	    <field name="expedicion_id" on_change="ch_ex(expedicion_id)"  attrs="{'readonly':[('state','in',('open','cancel','paid'))]}"/>
+	    <field name="nescala" on_change="ch_es(nescala)"  attrs="{'readonly':[('state','in',('open','cancel','paid'))]}"/>
+	    <field name="afecta"  attrs="{'readonly':[('state','in',('open','cancel','paid'))]}"/>	
+	    <button name="sobreescribir_exp" string="Reasignar Expedición" icon="terp-tools" type="object"  attrs="{'readonly':[('state','in',('open','cancel','paid'))]}"/>        
+	    <newline/>
+	</field>
+	<notebook position="inside">
+		<page string="Datos" attrs="{'readonly':[('state','in',('open','cancel','paid'))]}">
+			<field name="texto"  colspan="4"/>	
+			<field name="anexos"  colspan="4"/>			
+			<separator string="Referencias" colspan="4"/>
+			<newline/>
+			<group colspan="4">
+			<field name="ref1"  nolabel="1" colspan="1"/>
+			<field name="ref2" nolabel="1" colspan="1"/>
+			<field name="ref3"  nolabel="1" colspan="1"/>
+			<newline/>
+			<field name="ref4" nolabel="1" colspan="1"/>
+			<field name="ref5"  nolabel="1" colspan="1"/>
+			<field name="ref6" nolabel="1" colspan="1"/>
+			<newline/>
+			<field name="ref7"  nolabel="1" colspan="1"/>
+			<field name="ref8" nolabel="1" colspan="1"/>
+			<field name="ref9"  nolabel="1" colspan="1"/>
+			<newline/>
+			<field name="ref10" nolabel="1" colspan="1"/>
+			<field name="ref11"  nolabel="1" colspan="1"/>
+			<field name="ref12" nolabel="1"  colspan="1"/>
+			</group>
+		</page>
+	</notebook>
+      </field>
+    </record>
+
+
+
+
+
+  </data>
+</openerp>
