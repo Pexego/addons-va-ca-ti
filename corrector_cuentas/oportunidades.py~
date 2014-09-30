@@ -1,0 +1,274 @@
+# -*- encoding: utf-8 -*-
+# Copyright (c) 2005-2006 TINY SPRL. (http:__tiny.be) All Rights Reserved.
+#
+# $Id: product_expiry.py 4304 2006-10-25 09:54:51Z ged $
+#
+# WARNING: This program as such is intended to be used by professional
+# programmers who take the whole responsability of assessing all potential
+# consequences resulting from its eventual inadequacies and bugs
+# End users who are looking for a ready-to-use solution with commercial
+# garantees and support are strongly adviced to contract a Free Software
+# Service Company
+#
+# This program is Free Software; you can redistribute it and_or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#
+##############################################################################
+
+import datetime
+from osv import fields,osv
+import pooler
+import netsvc
+import time
+from xml import dom
+from xml.parsers import expat
+
+#######################################         BASE
+
+class crm_make_sale(osv.osv_memory):
+    """ Make sale  order for crm """
+
+    _inherit = "crm.make.sale"
+    _description = "Make sales"
+
+
+
+    def makeOrder(self, cr, uid, ids, context=None):
+        """
+        This function  create Quotation on given case.
+        @param self: The object pointer
+        @param cr: the current row, from the database cursor,
+        @param uid: the current user’s ID for security checks,
+        @param ids: List of crm make sales' ids
+        @param context: A standard dictionary for contextual values
+        @return: Dictionary value of created sales order.
+        """
+        if context is None:
+            context = {}
+
+        case_obj = self.pool.get('crm.lead')
+        sale_obj = self.pool.get('sale.order')
+        partner_obj = self.pool.get('res.partner')
+        data = context and context.get('active_ids', []) or []
+
+        for make in self.browse(cr, uid, ids, context=context):
+            partner = make.partner_id
+            partner_addr = partner_obj.address_get(cr, uid, [partner.id],
+                    ['default', 'invoice', 'delivery', 'contact'])
+            pricelist = partner.property_product_pricelist.id
+            fpos = partner.property_account_position and partner.property_account_position.id or False
+            new_ids = []
+            for case in case_obj.browse(cr, uid, data, context=context):
+                if not partner and case.partner_id:
+                    partner = case.partner_id
+                    fpos = partner.property_account_position and partner.property_account_position.id or False
+                    partner_addr = partner_obj.address_get(cr, uid, [partner.id],
+                            ['default', 'invoice', 'delivery', 'contact'])
+                    pricelist = partner.property_product_pricelist.id
+                if False in partner_addr.values():
+                    raise osv.except_osv(_('Data Insufficient!'), _('Customer has no addresses defined!'))
+
+                vals = {
+                    'origin': ('Oportunidad: %s') % str(case.id),
+                    'section_id': case.section_id and case.section_id.id or False,
+                    'categ_id': case.categ_id and case.categ_id.id or False,
+                    'shop_id': make.shop_id.id,
+                    'partner_id': partner.id,
+                    'pricelist_id': pricelist,
+                    'partner_invoice_id': partner_addr['invoice'],
+                    'partner_order_id': partner_addr['contact'],
+                    'partner_shipping_id': partner_addr['delivery'],
+                    'date_order': fields.date.context_today(self,cr,uid,context=context),
+                    'fiscal_position': fpos,
+                    'origen': case.origen,
+                }
+                if partner.id:
+                    vals['user_id'] = partner.user_id and partner.user_id.id or uid
+                new_id = sale_obj.create(cr, uid, vals, context=context)
+                sale_order = sale_obj.browse(cr, uid, new_id, context=context)
+                case_obj.write(cr, uid, [case.id], {'ref': 'sale.order,%s' % new_id})
+                new_ids.append(new_id)
+                message = _("Opportunity  '%s' is converted to Quotation.") % (case.name)
+                self.log(cr, uid, case.id, message)
+
+            if make.close:
+                case_obj.case_close(cr, uid, data)
+            if not new_ids:
+                return {'type': 'ir.actions.act_window_close'}
+            if len(new_ids)<=1:
+                value = {
+                    'domain': str([('id', 'in', new_ids)]),
+                    'view_type': 'form',
+                    'view_mode': 'form',
+                    'res_model': 'sale.order',
+                    'view_id': False,
+                    'type': 'ir.actions.act_window',
+                    'res_id': new_ids and new_ids[0]
+                }
+            else:
+                value = {
+                    'domain': str([('id', 'in', new_ids)]),
+                    'view_type': 'form',
+                    'view_mode': 'tree,form',
+                    'res_model': 'sale.order',
+                    'view_id': False,
+                    'type': 'ir.actions.act_window',
+                    'res_id': new_ids
+                }
+            return value
+
+crm_make_sale()
+
+
+class crm_actividad(osv.osv):
+
+    _name= 'crm.actividad'
+
+    _columns = {   
+		'name':fields.char('Actividad',size=256),
+
+	}
+
+crm_actividad()
+
+class crm_lead(osv.osv):
+    
+    _inherit= 'crm.lead'
+
+
+    def convert_opportunity(self, cr, uid, ids, partner_id, user_ids=False, section_id=False, context=None):
+        partner = self.pool.get('res.partner')
+        mail_message = self.pool.get('mail.message')
+        customer = False
+        if partner_id:
+            customer = partner.browse(cr, uid, partner_id, context=context)
+        for lead in self.browse(cr, uid, ids, context=context):
+            if lead.state in ('done', 'cancel'):
+                continue
+            self.write(cr, uid, ids, {'estado':'oportunidad'})
+            vals = self._convert_opportunity_data(cr, uid, lead, customer, section_id, context=context)
+            self.write(cr, uid, [lead.id], vals, context=context)
+            self._convert_opportunity_notification(cr, uid, lead, context=context)
+            self.case_open(cr, uid, [lead.id])
+            #TOCHECK: why need to change partner details in all messages of lead ?
+            if lead.partner_id:
+                msg_ids = [ x.id for x in lead.message_ids]
+                mail_message.write(cr, uid, msg_ids, {
+                        'partner_id': lead.partner_id.id
+                    }, context=context)
+
+        if user_ids or section_id:
+            self.allocate_salesman(cr, uid, ids, user_ids, section_id, context=context)
+
+        return True
+
+    def create(self, cr, uid, vals, context=None):
+
+        res = super(crm_lead,self).create(cr, uid, vals, context=context)
+
+	return res	
+
+	
+
+    def case_pending(self, cr, uid, ids, *args):
+
+	self.write(cr, uid, ids, {'estado':'pendiente'})
+
+        res = super(crm_lead,self).case_pending(cr, uid, ids, args)
+
+	return res
+
+    def case_cancel(self, cr, uid, ids, *args):
+
+	self.write(cr, uid, ids, {'estado':'oportunidadn'})
+
+        res = super(crm_lead,self).case_cancel(cr, uid, ids, args)
+
+	return res
+
+    def case_open(self, cr, uid, ids, *args):
+
+	self.write(cr, uid, ids, {'estado':'llamada'})
+
+        res = super(crm_lead,self).case_open(cr, uid, ids, args)
+
+	return res
+
+    _columns = {
+                 'crear':fields.boolean('Crear'),
+                 'cod_op':fields.char('Codigo oportunidad 99Labs', size=64),
+                 'estado_iniciativa':fields.selection([('llo','Lead - Llamada pendiente'), ('lsi','Lead - solo info'), ('lna','Lead - no hace analisis')], 'Etapa', size=32) ,
+
+		 'estado':fields.selection([
+                            ('registro', 'Registro'),
+                            ('llamada', 'Llamada'),
+                            ('oportunidad', 'Oportunidad si'),
+                            ('oportunidadn', 'Oportunidad no'),
+                            ('pendiente', 'Pendiente'),
+                                    ], string="Estado"),   
+
+		 'origen':fields.selection([
+                            ('franquiciado', 'Franquiciado'),
+                            ('callcenter', 'Call center')
+                                    ], string="Origen"),   
+  
+		 'eval_callcenter':fields.selection([
+                            ('1p', '1 punto – Al llegar, el cliente dice que no está interesado en nuestra oferta'),
+                            ('2p', '2- puntos – El cliente no se encuentra a la hora indicada, pero nos recibe y se interesa por la oferta'),
+                            ('3p', '3 puntos – El cliente muestra interés por la oferta')
+                                    ], string="Evaluar Callcenter"),       
+   		 'anotacion':fields.char('Anotaciones',size=256),
+		 'probabilidad':fields.selection([
+                            ('25', '25% - Hemos llamado al cliente y dice que sí hace análisis'),
+                            ('50', '50% - He ido, está interesado y le he mandado propuesta'),
+                            ('75', '75% - Dentro de este mes, el cliente me ha dicho que es muy probable que me firme el presupuesto'),
+			    ('100', '100% - Contrato firmado')
+                                    ], string="Probabilidad"), 
+		'cuantificador':fields.integer('Auxiliar'),
+                'activity':fields.char('Actividad', size= 256),
+		'actividad':fields.many2one('crm.actividad','Actividad'),
+		'act_ini':fields.selection([
+		('Hoteles y otros alojamientos turisticos', 'Hoteles y otros alojamientos turisticos'),
+		('Restaurantes', 'Restaurantes'),
+		('Bares y cafeterias', 'Bares y cafeterias'),
+		('Empresas de catering', 'Empresas de catering'),
+		('Fabricantes sector carnico y embutidos', 'Fabricantes sector carnico y embutidos'),
+		('Fabricantes sector lacteo y derivados', 'Fabricantes sector lacteo y derivados'),
+		('Fabricantes sector agua y bebidas no alcoholicas', 'Fabricantes sector agua y bebidas no alcoholicas'),
+		('Fabricantes sector vino y bebidas alcoholicas', 'Fabricantes sector vino y bebidas alcoholicas'),
+		('Fabricantes sector panaderia y pasteleria', 'Fabricantes sector panaderia y pasteleria'),
+		('Fabricantes sector pescados y mariscos', 'Fabricantes sector pescados y mariscos'),
+		('Comercio sector carnico y embutidos', 'Comercio sector carnico y embutidos'),
+		('Comercio sector lacteo y derivados', 'Comercio sector lacteo y derivados'),
+		('Comercio sector panaderia y pasteleria', 'Comercio sector panaderia y pasteleria'),
+		('Comercio sector pescados y mariscos', 'Comercio sector pescados y mariscos'),
+		('Comercio otros sectores alimenticios', 'Comercio otros sectores alimenticios'),
+		('Balnearios y spas', 'Balnearios y spas'),
+		('Hospitales, centros de salud y clinicas', 'Hospitales, centros de salud y clinicas'),
+		('Ayuntamientos y otros organismos publicos', 'Ayuntamientos y otros organismos publicos'),
+		('Colegios y otros centros de enseñanza', 'Colegios y otros centros de enseñanza'),
+		('Residencias de ancianos y estudiantiles', 'Residencias de ancianos y estudiantiles'),
+		('Otros', 'Otros')], string="Actividad"), 
+
+		'haceanalisis':fields.selection([('si','Sí'),('no','No')],'¿Realizan análisis?'),
+		'dircoincide':fields.selection([('si','Sí'),('no','No')],' ¿La dirección de la Base de Datos coincide con la de la visita?'),
+		'estaninteresados':fields.selection([('op3','3. Muy interesados'),('op2','2. Interesados'),('op1','1. No interesados o poco interesados')],'Nivel de interés'),
+
+                }
+
+    _defaults = {   
+  	'estado': 'registro',
+  	'cuantificador': 1,
+                }
+crm_lead()

@@ -1,0 +1,52 @@
+<?xml version="1.0" ?>
+<terp>
+	<data>
+	
+	
+		<record model="ir.ui.view" id="account_aux_form">
+		<field name="name">account.aux</field>
+		<field name="model">account.aux</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+		<form string="Cambiar">
+			<button type="object" name="contrastar" string="contrastar"/>
+		</form>
+            </field>
+		</record>
+   
+   		<record model="ir.ui.view" id="account_aux_tree">
+		<field name="name">account.aux.tree</field>
+		<field name="model">account.aux</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+		<tree string="Cambiar">
+			<field name="name"/>
+			<field name="id_aux"/>
+		</tree>
+            </field>
+		</record>
+
+
+     <record id="account_tax_form_action" model="ir.actions.act_window">
+            <field name="name">Cuentas</field>
+            <field name="res_model">account.tax</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="account_aux_tree"/>
+        </record>
+        
+        
+        <menuitem
+		  	name="Cuentas"
+            id="acc_fran_form"            
+            sequence="20" 
+            icon="terp-check"/>
+        
+   		  <menuitem
+            action="account_tax_form_action"
+            id="acc_aux_form_menu"
+	     icon="terp-go-home"
+             sequence="20" parent="acc_fran_form"/>
+
+</data>
+</terp>

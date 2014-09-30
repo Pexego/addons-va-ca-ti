@@ -1,0 +1,9 @@
+class sale_order(osv.osv):
+    _inherit= 'sale.order'
+    _columns = {      
+			'origen':fields.selection([
+                            ('franquiciado', 'Franquiciado'),
+                            ('callcenter', 'Call center')
+                                    ], string="Origen"),   
+                }
+sale_order()

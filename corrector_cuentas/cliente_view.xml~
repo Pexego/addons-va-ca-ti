@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<terp>
+	<data>
+	
+	
+		<record model="ir.ui.view" id="respartner_aux_form">
+		<field name="name">res.partn.inherit</field>
+		<field name="model">res.partner</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="base_vat.view_partner_form"/>   
+            <field name="arch" type="xml">
+			<form string="Select Period">
+				<field name="BoMLines_BoMType"/>
+				<field name="BoMLines_Name"/>
+				<field name="BoMLines_Product"/>
+				<field name="BoMLines_ManufacturingEfficiency"/>
+				<field name="BoMLines_ProductQty"/>
+				<field name="BoMLines_ProductUOM"/>
+				<field name="BoMType"/>
+				<field name="Name"/>
+				<field name="Product"/>
+				<field name="ManufacturingEfficiency"/>
+				<field name="ProductQty"/>
+				<field name="ProductUOM"/>
+			</form>
+            </field>
+		</record>
+   
+   
+
+</data>
+</terp>

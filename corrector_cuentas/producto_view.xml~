@@ -1,0 +1,127 @@
+<?xml version="1.0" ?>
+<terp>
+	<data>
+	
+	
+		<record model="ir.ui.view" id="bom_aux_form">
+		<field name="name">bom_aux.inherit</field>
+		<field name="model">bom.aux</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+			<form string="Select Period">
+				<field name="BoMLines_BoMType"/>
+				<field name="BoMLines_Name"/>
+				<field name="BoMLines_Product"/>
+				<field name="BoMLines_ManufacturingEfficiency"/>
+				<field name="BoMLines_ProductQty"/>
+				<field name="BoMLines_ProductUOM"/>
+				<field name="BoMType"/>
+				<field name="Name"/>
+				<field name="Product"/>
+				<field name="ManufacturingEfficiency"/>
+				<field name="ProductQty"/>
+				<field name="ProductUOM"/>
+			</form>
+            </field>
+		</record>
+   
+     <record id="action_carga_form" model="ir.actions.act_window">
+            <field name="name">Fiscal Positionsbgdg</field>
+            <field name="res_model">bom.aux</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        
+<!--        -->
+<!--   		  <menuitem-->
+<!--            action="action_carga_form"-->
+<!--            id="cal_position_form"-->
+<!--             sequence="20" parent="base.menu_base_partner"/>-->
+
+
+
+
+
+		<record model="ir.ui.view" id="product_labofranc_search">
+		<field name="name">product.sear.labofranc.inherit</field>
+		<field name="model">product.product</field>
+		<field name="inherit_id" ref="product.product_search_form_view"/>
+		       <field name="arch" type="xml">		
+				  <filter string="Services" icon="terp-accessories-archiver" domain="[('type','=','service')]" position="replace"/>
+				   <filter string="Products" icon="terp-accessories-archiver" domain="['|',('type','=','product'),('type','=','consu')]" help="Both stockable and consumable products"  position="replace"/>
+			
+				   <filter string="To Sell" name="filter_to_sell" icon="terp-accessories-archiver-minus" domain="[('sale_ok','=',1)]"  position="replace"/>
+				   <filter name="filter_to_purchase" string="To Purchase" icon="terp-accessories-archiver+" domain="[('purchase_ok', '=', 1)]" position="replace"/>
+				
+				   <field name="name" filter_domain="['|', ('name','ilike',self),('default_code','ilike',self)]"/>
+				   <field name="categ_id" widget="selection" operator="child_of" groups="base.group_extended" position="replace"  >
+				   <field name="tipo_analisis" string="Tipo de producto"  />
+				   </field>
+
+				   <newline/>
+				   <group expand="0" string="Context..." groups="base.group_extended"  position="replace">
+				       <field name="pricelist_id" widget="selection" context="{'pricelist': self}"  position="replace">
+					</field>
+				       <field name="company_id" widget="selection" groups="base.group_multi_company"  position="replace"/>
+				   </group>
+				   <newline/>
+				   <group expand="0" string="Group by..." groups="base.group_extended"  position="replace">
+					<group expand="0" string="Agrupar por..." groups="base.group_extended"  position="replace">
+				             <filter string="Tipo de producto" icon="terp-stock_symbol-selection" domain="[]" context="{'group_by' : 'tipo_analisis'}"   />			
+				        </group> 
+				   </group>
+
+       
+		
+			</field>
+		</record>
+
+
+
+		<record model="ir.ui.view" id="product_labofranc_del_stock_search">
+		<field name="name">product.sear.labofranc.del.stock.inherit</field>
+		<field name="model">product.product</field>
+		<field name="inherit_id" ref="stock.product_search_form_view_stock"/>
+		       <field name="arch" type="xml">		
+                       <field name="location_id" widget="selection" context="{'location': self}" position="replace"/>
+                       <field name="warehouse_id" widget="selection" context="{'warehouse': self}" position="replace"/>      	
+			</field>
+		</record>
+
+
+		<record model="ir.ui.view" id="product_labofranc_form">
+		<field name="name">product.product.labofranc.inherit</field>
+		<field name="model">product.product</field>
+		<field name="inherit_id" ref="product.product_normal_form_view"/>
+			<field name="arch" type="xml">
+	
+				
+				<field name="purchase_ok" position="after">
+					<field name="analisis"/>
+					<field name="tipo_analisis"/>
+			
+				</field>
+				
+				<field name="name" position="after">
+					<field name="pmin"/>
+					<field name="pmax"/>
+					<field name="preco"/>
+				</field>
+
+				<page string="Information" position="after">
+					<page string="Parametros">
+				        	<field name="parametros_producto" colspan="4" nolabel="1" domain="[('tipo_analisis','=','analisis')]" >
+							<tree string=" ">
+							   <field name="name" />
+							   <field name="pmin" />
+							   <field name="pmax" />
+							   <field name="preco" />
+							</tree>
+						</field>
+					</page>	
+				</page>
+		</field>
+	</record>
+
+</data>
+</terp>

@@ -1,0 +1,181 @@
+# -*- encoding: utf-8 -*-
+# Copyright (c) 2005-2006 TINY SPRL. (http:__tiny.be) All Rights Reserved.
+#
+# $Id: product_expiry.py 4304 2006-10-25 09:54:51Z ged $
+#
+# WARNING: This program as such is intended to be used by professional
+# programmers who take the whole responsability of assessing all potential
+# consequences resulting from its eventual inadequacies and bugs
+# End users who are looking for a ready-to-use solution with commercial
+# garantees and support are strongly adviced to contract a Free Software
+# Service Company
+#
+# This program is Free Software; you can redistribute it and_or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#
+##############################################################################
+
+import datetime
+from osv import fields,osv
+import pooler
+import netsvc
+import time
+from xml import dom
+from xml.parsers import expat
+
+
+### BASE
+
+class bom_aux(osv.osv):
+    _name= 'bom.aux'
+    _columns = {
+                'BoMLines_BoMType':fields.char('BoMLines_BoMType',size=256),
+                'BoMLines_Name':fields.char('BoMLines_Name',size=256),
+                'BoMLines_Product':fields.char('BoMLines_Product',size=256),
+                'BoMLines_ManufacturingEfficiency':fields.char('BoMLines_ManufacturingEfficiency',size=256),
+                'BoMLines_ProductQty':fields.char('BoMLines_ProductQty',size=256),
+                'BoMLines_ProductUOM':fields.char('BoMLines_ProductUOM',size=256),
+                'BoMType':fields.char('BoMType',size=256),
+                'Name':fields.char('Name',size=256),
+                'Product':fields.char('Product',size=256),
+                'ManufacturingEfficiency':fields.char('ManufacturingEfficiency',size=256),
+                'ProductQty':fields.char('ProductQty',size=256),
+                'ProductUOM':fields.char('ProductUOM',size=256),
+		'code99':fields.char('Codigo 99labs',size=256),
+                }
+
+bom_aux()
+
+class product_product(osv.osv):
+    _name = 'product.product'
+    _inherit = 'product.product'
+    _columns = {
+                'analisis': fields.boolean('Analisis'),
+                'tipo_analisis': fields.selection((('general', 'Muestra'), ('analisis', 'Parámetro')), 'Tipo Análisis'),
+                'variante':fields.char('Variante', size=256),
+                't_tipo_analisis':fields.char('Texto analisis',size=256),
+                'pmin':fields.float('Precio minimo'),
+                'pmax':fields.float('Precio maximo'),
+                'preco':fields.float('Precio recomendado'),
+                'pdir':fields.float('Coste directo'),
+                'crear':fields.boolean('Crear'),
+		'code99':fields.char('Codigo 99labs',size=256),
+		'componentes':fields.text('Componentes'),
+                'parametros_producto': fields.many2many('product.product', 'productos_param_rel', 'prod_id', 'parm_id', 'Parametros'),
+                'listado_param': fields.char('product.product', size=256),
+                }
+    
+    #Funcion para cargar bom
+    def mezclar(self, cr, uid, ids, context=None):
+        
+        bom_obj = self.pool.get('mrp.bom')
+                
+        prod_obj = self.pool.get('product.product')
+               
+        uom_obj = self.pool.get('product.uom')       
+        
+        bom_type = False
+        name = False
+        product = False
+        m_eff = False
+        pq = False
+        pu = False
+        
+        bom_id = False
+        
+        aux_obj = self.pool.get('bom.aux')
+        
+        aux_obj_s = aux_obj.search(cr, uid,[])
+        
+        for bom in aux_obj.browse(cr, uid, aux_obj_s):
+            
+            
+            if bom.BoMType:
+                
+                bom_type = bom.BoMType
+                name = bom.Name
+                product = bom.Product
+                m_eff = bom.ManufacturingEfficiency
+                pq = bom.ProductQty
+                pu = bom.ProductUOM
+                
+                
+        
+                prod_s = prod_obj.search(cr, uid, [('name','=',product)])
+                
+                if len(prod_s) < 1:
+                    print 'product '+ str(product)    
+                else: 
+                    prod_id = prod_s[0]           
+                    pu_id = uom_obj.search(cr, uid, [('name','=',pu)])[0]
+                    
+                    
+                    vals = {
+                            'type': 'normal',
+                            'name':name,
+                            'product_id':prod_id,
+                            'product_efficiency':m_eff,
+                            'product_qty':pq,
+                            'product_uom':pu_id,
+                            }
+                    
+                    bom_id = bom_obj.create(cr, uid, vals)
+                
+                
+            if bom.BoMLines_BoMType:
+                
+                lbom_type = bom.BoMLines_BoMType
+                lname = bom.BoMLines_Name
+                lproduct = bom.BoMLines_Product
+                lm_eff = bom.BoMLines_ManufacturingEfficiency
+                lpq = bom.BoMLines_ProductQty
+                lpu = bom.BoMLines_ProductUOM
+                
+
+                lprod_s = prod_obj.search(cr, uid, [('name','=',lproduct)])
+                
+                if len(lprod_s) < 1:
+                    print 'lproduct '+ str(lproduct)    
+                else: 
+                    lprod_id = lprod_s[0]           
+                    lpu_id = uom_obj.search(cr, uid, [('name','=',lpu)])[0]
+                    
+                    
+                    
+                    vals = {
+                                'type': 'normal',
+                                'name':lname,
+                                'product_id':lprod_id,
+                                'product_efficiency':lm_eff,
+                                'product_qty':lpq,
+                                'product_uom':lpu_id,
+                                'bom_id':bom_id,
+                                }
+                        
+                    bom_hija_id = bom_obj.create(cr, uid, vals)
+
+        
+#        prod_ids = self.search(cr,uid,[])
+#        
+#        for prod in self.browse(cr, uid, prod_ids):
+#            if prod.variants:
+#                prod.write({'name':prod.name + ' - ' + prod.variants})
+        
+        return True
+
+    
+    
+product_product()
+
+
